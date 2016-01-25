@@ -6,7 +6,7 @@
 # 历史数据节点
 
 
-QT       += xml gui core
+QT       += xml gui core webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -33,7 +33,8 @@ SOURCES += \
     ../CGI_SCADA_include/ItemDelegate/CItemDelegateReadOnly.cpp \
     ../CGI_SCADA_DLL_ChannelMessage/UI_NetAttribute.cpp \
     ../CGI_SCADA_include/XmlParser/CXmlParser.cpp \
-    ../CGI_SCADA_include/CGI_SCADA_define.cpp
+    ../CGI_SCADA_include/CGI_SCADA_define.cpp \
+    CGI_SCADA_DLL_TreeItemHistorySelect.cpp
 
 HEADERS += ../CGI_SCADA_include/CGI_SCADA_DLL_I.h \
     CGI_SCADA_DLL_HistoryMessageItem.h \
@@ -54,7 +55,8 @@ HEADERS += ../CGI_SCADA_include/CGI_SCADA_DLL_I.h \
     ../CGI_SCADA_DLL_ChannelMessage/CGI_SCADA_DLL_TableView.h \
     ../CGI_SCADA_DLL_ChannelMessage/UI_NetAttribute.h \
     ../CGI_SCADA_include/XmlParser/CXmlParser.h \
-    ../CGI_SCADA_include/CGI_SCADA_define.h
+    ../CGI_SCADA_include/CGI_SCADA_define.h \
+    CGI_SCADA_DLL_TreeItemHistorySelect.h
 
 unix {
     target.path = /usr/lib

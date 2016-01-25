@@ -8,7 +8,11 @@
 #include <QNetworkCookie>
 #include "../CGI_SCADA_include/CGI_SCADA_define.h"
 
-#define URL_TreeItemType_About_M "http://%1/cgi-bin/web.cgi?web=About"
+/// web 2.0
+//#define URL_TreeItemType_About_M "http://%1/cgi-bin/web.cgi?web=About"
+
+/// web 3.0
+#define URL_TreeItemType_About_M "http://%1:8000/bin/web.wk?web=About"
 
 class CGI_SCADA_DLL_TreeItemAboutMessage : public CGI_SCADA_DLL_TreeItemBase
 {

@@ -9,7 +9,11 @@
 #include <QNetworkCookie>
 #include "../CGI_SCADA_include/CGI_SCADA_define.h"
 
-#define URL_TreeItemType_UserMaM "http://%1/cgi-bin/web.cgi?web=Users"
+/// web2.0
+//#define URL_TreeItemType_UserMaM "http://%1/cgi-bin/web.cgi?web=Users"
+
+/// web 3.0
+#define URL_TreeItemType_UserMaM "http://%1:8000/bin/web.wk?web=Users"
 
 class CGI_SCADA_DLL_TreeItemUserManagerMessage : public CGI_SCADA_DLL_TreeItemBase
 {

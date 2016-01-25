@@ -29,6 +29,10 @@ CGI_SCADA_DLL_HistoryMessageItem::CGI_SCADA_DLL_HistoryMessageItem(const QString
     m_pCGI_SCADA_DLL_HistoryM_Setting = new CGI_SCADA_DLL_HistoryM_Setting(QStringList()<<"设置",TreeItemType_HistorM_HistorySettings,this);
     connect(m_pCGI_SCADA_DLL_HistoryM_Setting,SIGNAL(signal_ShowMessageDebug(int,QString)),this,SIGNAL(signal_ShowMessageDebug(int,QString)));
     this->addChild(m_pCGI_SCADA_DLL_HistoryM_Setting);
+
+    m_pCGI_SCADA_DLL_TreeItemHistorySelect = new CGI_SCADA_DLL_TreeItemHistorySelect(this,QStringList()<<"查询",TreeItemType_HistorM_HistorySelect,this);
+    connect(m_pCGI_SCADA_DLL_TreeItemHistorySelect,SIGNAL(signal_ShowMessageDebug(int,QString)),this,SIGNAL(signal_ShowMessageDebug(int,QString)));
+    this->addChild(m_pCGI_SCADA_DLL_TreeItemHistorySelect);
 }
 
 /*!

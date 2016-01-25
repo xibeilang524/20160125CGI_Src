@@ -3,6 +3,7 @@
 
 #include "../CGI_SCADA_include/CGI_SCADA_DLL_TreeItemBase.h"
 #include "CGI_SCADA_DLL_HistoryM_Setting.h"
+#include "CGI_SCADA_DLL_TreeItemHistorySelect.h"
 
 class CGI_SCADA_DLL_HistoryMessageItem : public CGI_SCADA_DLL_TreeItemBase
 {
@@ -22,7 +23,8 @@ public slots:
 private:
     QStringList m_DBFileList;
     QLabel *m_pLabel;
-    CGI_SCADA_DLL_HistoryM_Setting *m_pCGI_SCADA_DLL_HistoryM_Setting;
+    CGI_SCADA_DLL_HistoryM_Setting      *m_pCGI_SCADA_DLL_HistoryM_Setting;
+    CGI_SCADA_DLL_TreeItemHistorySelect *m_pCGI_SCADA_DLL_TreeItemHistorySelect;
 
     void FindFile(QString strPathName_);
 };

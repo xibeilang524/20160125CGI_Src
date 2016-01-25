@@ -53,7 +53,7 @@ QWidget *CGI_SCADA_DLL_TreeItemUserManagerMessage::GetWidget(QTreeWidgetItem *)
     if (!m_bIP_CookieIsInit)
     {
         QList<QNetworkCookie> cookies;
-        cookies.append(QNetworkCookie("key1", CGI_SCADA_define::s_baCookie));
+        cookies.append(QNetworkCookie("CMMSUSS", CGI_SCADA_define::s_baCookie));
         qDebug()<<__func__<<__LINE__<<CGI_SCADA_define::s_strIPAddress<<CGI_SCADA_define::s_baCookie;
         m_pCookieJar->setCookiesFromUrl(cookies, QString(URL_TreeItemType_UserMaM).arg(CGI_SCADA_define::s_strIPAddress));
         m_bIP_CookieIsInit = true;

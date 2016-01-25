@@ -68,13 +68,10 @@ void UI_Login_Dialog::replyFinished(QNetworkReply *reply)
         QByteArray bytes = reply->readAll();
         qDebug()<<__func__<<__LINE__<<bytes;
         QString string = QString::fromUtf8(bytes);
-//        ui->textBrowser->setText(string);
     }
     else
     {
         qDebug()<<"handle errors here";
-//        ui->textBrowser->append("DEBUG Message:");
-//        ui->textBrowser->append("handle errors here");
         QVariant statusCodeV = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     //statusCodeV是HTTP服务器的相应码，reply->error()是Qt定义的错误码，可以参考QT的文档
         qDebug( "found error ....code: %d %d\n", statusCodeV.toInt(), (int)reply->error());
@@ -84,7 +81,6 @@ void UI_Login_Dialog::replyFinished(QNetworkReply *reply)
     }
     reply->deleteLater();
 
-//    qDebug()<<__func__<<__LINE__<<"_______________start";
     QList<QNetworkCookie> cookies = network_cookie_.GetCookies();
     qDebug()<<__func__<<__LINE__<<"cookie个数"<<cookies.count();
     if (cookies.isEmpty())
@@ -106,7 +102,6 @@ void UI_Login_Dialog::replyFinished(QNetworkReply *reply)
             CGI_SCADA_define::s_strIPAddress = ui->lineEdit->text();
         }
     }
-//    qDebug()<<__func__<<__LINE__<<"_______________end";
 }
 
 /*!
