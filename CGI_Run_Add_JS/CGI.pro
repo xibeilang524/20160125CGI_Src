@@ -12,10 +12,12 @@ SUBDIRS += \
     CGI_HDB \
     IEC-104 \
     CGI_RTDB \
+    CGI_RTDB_web3 \
     ServerRun \
     ModbusTcp \
     ModbusRtu \
     CGI_RTFrame \
+    CGI_RTFrame_web3 \
     CGI_CLINKLib \
 #    DeliverIEC-104 \
     CGI_DeliverIEC-104 \
