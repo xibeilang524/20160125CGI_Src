@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Image/ico/app.ico</file>
+        <file>Image/ico/channel.ico</file>
+        <file>Image/ico/collectd.ico</file>
+        <file>Image/ico/device.ico</file>
+        <file>Image/ico/help.ico</file>
+        <file>Image/ico/mamager.ico</file>
+        <file>Image/ico/network.ico</file>
+        <file>Image/ico/networkc.ico</file>
+        <file>Image/ico/network-transmit.ico</file>
+        <file>Image/ico/new.ico</file>
+        <file>Image/ico/real.ico</file>
+        <file>Image/ico/save.ico</file>
+        <file>Image/ico/settings.ico</file>
+        <file>Image/ico/system.ico</file>
+        <file>Image/ico/window.ico</file>
+    </qresource>
+</RCC>

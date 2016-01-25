@@ -1,0 +1,63 @@
+1、研究CAN通讯，研究CAN帧的报文帧结构和格式等
+2、总结出一个CAN通讯的类，此类在一个新的线程中运行
+3、此CAN通讯类对于发送方发送的帧ID中第28、29位值为1的报文，自动将第28、29位置0,不清楚什么原因导致的，因此目前希望发送方不要发送第28、29位为1的报文帧
+4、整理出自己的My_can_frame结构体，在发送can帧时使用此结构体即可，向此结构体中添加数据
+详情见：http://blog.csdn.net/zhangxiaopeng0829/article/details/7646639
+基本的CAN帧结构体和套接字地址结构体定义在include/linux/can.h中。
+扩展格式标识符由29位组成。其格式包含两个部分：11位基本ID、18位扩展ID。
+* bit 0-28   : CAN识别符 (11/29 bit)
+* bit 29     : 错误帧标志 (0 = data frame, 1 = error frame) 0表示正确帧
+                           1表示错误帧，当帧格式为错误帧时，接收到的数据部分的值都为0，即8字节的数据都为0
+* bit 30     : 远程发送请求标志 (1 = rtr frame)
+* bit 31     : 帧格式标志 (0 = standard 11 bit, 1 = extended 29 bit)
+                       0表示标准帧，帧ID占11位，即只有11位帧ID有效
+                       1表示扩展帧，帧ID占29位，即29位帧ID有效
+
+typedef __u32 canid_t;
+struct can_frame {
+     canid_t can_id;  /* 32 bit CAN_ID + EFF/RTR/ERR flags */
+      __u8    can_dlc; /* 数据长度: 0 .. 8 */
+      __u8    data[8] __attribute__((aligned(8)));
+ };
+
+结构体的有效数据在data[]数组中，它的字节对齐是64bit的，所以用户可以比较方便的在data[]中传输自己定义的结构体和共用体。CAN总线中没有默认的字节序。在CAN_RAW套接字上调用read(2)，返回给用户空间的数据是一个struct can_frame结构体。
+
+//比如对于没有错误检查CAN_RAW套接字
+s = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+发送方即便发送第28、29位为1的的帧，接收方也会将第28、29位置0。
+
+
+发送标准帧、正确帧、数据长度为标准8个字节长度：
+        send	:FFFFFF1F 08050607 08090A0B0C0D0E0F
+        receive	:FF070000 08000000 08090A0B0C0D0E0F
+发送标准帧、正确帧、数据长度不为标准8个字节长度
+        send	:FFFFFF1F 06050607 08090A0B0C0D0E0F
+        receive	:FF070000 06000000 08090A0B0C0D0000
+
+
+发送标准帧、错误帧、数据长度为标准8个字节长度
+        send	:FFFFFF7F 08050607 08090A0B0C0D0E0F
+        receive	:FF070000 08000000 0000000000000000
+        send	:FFFFFF3F 08050607 08090A0B0C0D0E0F
+        receive	:FF070000 08000000 08090A0B0C0D0E0F
+发送标准帧、错误帧、数据长度不为标准8个字节长度
+        send	:FFFFFF9F 08050607 08090A0B0C0D0E0F
+        receive	:FFFFFF9F 08000000 08090A0B0C0D0E0F
+
+
+
+发送扩展帧、正确帧、数据长度为标准8字节长度
+        send	:FFFFFF9F 08050607 08090A0B0C0D0E0F
+        receive	:FFFFFF9F 08000000 08090A0B0C0D0E0F
+发送扩展帧，正确帧，数据长度不为标准8字节长度：
+        send	:FFFFFF9F 06050607 08090A0B0C0D0E0F
+        receive	:FFFFFF9F 06000000 08090A0B0C0D0000
+
+
+发送扩展帧，错误帧，数据长度为标准8字节长度：
+        send	:FFFFFFFF 08050607 08090A0B0C0D0E0F
+        receive	:FFFFFF9F 08000000 08090A0B0C0DFFFF
+发送扩展帧，错误帧，数据长度不为标准8字节长度：
+        send	:FFFFFFFF 06050607 08090A0B0C0D0E0F
+        receive	:FFFFFF9F 06000000 0000000000000000
+
