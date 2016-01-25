@@ -12,7 +12,7 @@
 //#define URL_TreeItemType_About_M "http://%1/cgi-bin/web.cgi?web=About"
 
 /// web 3.0
-#define URL_TreeItemType_About_M "http://%1:8000/bin/web.wk?web=About"
+#define URL_TreeItemType_About_M "http://%1:8000/bin/Qt.wk?web=About"
 
 class CGI_SCADA_DLL_TreeItemAboutMessage : public CGI_SCADA_DLL_TreeItemBase
 {

@@ -11,7 +11,7 @@
 //#define URL_TreeItemType_HistorySelect   "http://%1/cgi-bin/web.cgi?web=HistorySelect"
 
 /// web 3.0
-#define URL_TreeItemType_HistorySelect   "http://%1:8000/bin/web.wk?web=HistorySelect"
+#define URL_TreeItemType_HistorySelect   "http://%1:8000/bin/Qt.wk?web=HistorySelect"
 
 class CGI_SCADA_DLL_TreeItemHistorySelect : public CGI_SCADA_DLL_TreeItemBase
 {
