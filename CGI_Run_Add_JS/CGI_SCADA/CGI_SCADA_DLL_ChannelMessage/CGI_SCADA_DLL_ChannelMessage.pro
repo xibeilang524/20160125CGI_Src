@@ -38,7 +38,8 @@ SOURCES += \
     ../CGI_SCADA_include/ItemDelegate/CItemDelegateEdit.cpp \
     ../CGI_SCADA_include/ItemDelegate/CItemDelegateLabel.cpp \
     ../CGI_SCADA_include/ItemDelegate/CItemDelegateReadOnly.cpp \
-    ../CGI_SCADA_include/CGI_SCADA_define.cpp
+    ../CGI_SCADA_include/CGI_SCADA_define.cpp \
+    CGI_SCADA_DLL_CommandThread.cpp
 
 HEADERS += ../CGI_SCADA_include/CGI_SCADA_DLL_I.h \
     CGI_SCADA_DLL_ChannelMessageItem.h \
@@ -65,7 +66,8 @@ HEADERS += ../CGI_SCADA_include/CGI_SCADA_DLL_I.h \
     ../CGI_SCADA_include/ItemDelegate/CItemDelegateEdit.h \
     ../CGI_SCADA_include/ItemDelegate/CItemDelegateLabel.h \
     ../CGI_SCADA_include/ItemDelegate/CItemDelegateReadOnly.h \
-    ../CGI_SCADA_include/CGI_SCADA_define.h
+    ../CGI_SCADA_include/CGI_SCADA_define.h \
+    CGI_SCADA_DLL_CommandThread.h
 
 unix {
     target.path = /usr/lib

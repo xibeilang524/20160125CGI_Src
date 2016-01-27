@@ -27,6 +27,7 @@ public:
     bool SetNetLinkElem(const QDomElement &LinkElem_);
 signals:
     void signal_ProtocolTypeChange(int);
+    void signal_ChangeProtocolName(QString strProtocolName);
 
 private:
     void SetFileName_New();

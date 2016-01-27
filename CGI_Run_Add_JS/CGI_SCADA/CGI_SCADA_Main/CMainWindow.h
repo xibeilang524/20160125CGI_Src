@@ -45,6 +45,8 @@ private slots:
 
     void on_actionBuild_triggered();
 
+    void on_actionReadMe_triggered();
+
 private:
 
 private:

@@ -5,6 +5,7 @@
 #include "CGI_SCADA_DLL_TreeItemDevice.h"
 #include "UI_COMCAN_Attribute.h"
 #include "CGI_SCADA_DeviceConfig.h"
+#include <QProcess>
 
 class CGI_SCADA_DLL_TreeItemCOM : public CGI_SCADA_DLL_TreeItemBase
 {
@@ -27,11 +28,15 @@ private:
 //    CGI_SCADA_DLL_TreeItemComCanAttribute *m_pAttributeItem;
     int m_nComNumber;///< 通道号
     ProtocolType m_nProtocolType;
+    QString m_strProtocolName;
+    QProcess m_Process;
 private slots:
+    void slot_ChangeProtocolName(QString strProtocolName);
     void slot_AddDevice();
     void slot_DeleteChannel();
     void slot_ProtocolTypeChange(int nProtocolType_);
     void slot_SetEnable(bool);
+    void slot_ProtocolExplanation();
 };
 
 #endif // CGI_SCADA_DLL_TREEITEMCOM_H

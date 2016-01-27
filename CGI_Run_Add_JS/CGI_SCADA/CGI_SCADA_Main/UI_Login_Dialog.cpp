@@ -26,7 +26,8 @@ UI_Login_Dialog::~UI_Login_Dialog()
 
 bool UI_Login_Dialog::GetLoginStatus()
 {
-    return m_bLoginStatus;
+    return true;
+//    return m_bLoginStatus;
 }
 
 QByteArray UI_Login_Dialog::GetLoginCookie()

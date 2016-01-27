@@ -1,5 +1,7 @@
 #include "CGI_SCADA_DLL_TreeItemNetLink.h"
 #include "UI_CreateDeviceDialog.h"
+#include <QThread>
+#include <QProcess>
 
 
 CGI_SCADA_DLL_TreeItemNetLink::CGI_SCADA_DLL_TreeItemNetLink(QTreeWidgetItem *parentItem, const QStringList &strings, int type, QObject *parent) :
@@ -8,6 +10,7 @@ CGI_SCADA_DLL_TreeItemNetLink::CGI_SCADA_DLL_TreeItemNetLink(QTreeWidgetItem *pa
     m_pMainWidget = new UI_COMCAN_Attribute(TreeItemType_ChanneM_NET_Link_Attribute);
     connect(m_pMainWidget,SIGNAL(signal_ProtocolTypeChange(int)),this,SLOT(slot_ProtocolTypeChange(int)));
     connect(m_pMainWidget,SIGNAL(signal_ProtocolTypeChange(int)),this,SIGNAL(signal_ProtocolTypeChange(int)));
+    connect(m_pMainWidget,SIGNAL(signal_ChangeProtocolName(QString)),this,SLOT(slot_ChangeProtocolName(QString)));
 }
 
 QWidget *CGI_SCADA_DLL_TreeItemNetLink::GetWidget(QTreeWidgetItem */*pItem_*/)
@@ -24,15 +27,15 @@ void CGI_SCADA_DLL_TreeItemNetLink::GetPopUpMenu()
     QAction *pAddDevice = new QAction(tr("新建设备"), SwitchMenu);
     connect(pAddDevice, SIGNAL(triggered()), this, SLOT(slot_AddDevice()));
 
-    QAction *pDeleteChannel = new QAction(tr("删除通道"), SwitchMenu);
+    QAction *pDeleteChannel = new QAction(tr("删除链接"), SwitchMenu);
     connect(pDeleteChannel, SIGNAL(triggered()), this, SLOT(slot_DeleteChannel()));
 
-//    QAction *pAddNET = new QAction(tr("添加NET"),SwitchMenu);
-//    connect(pAddNET,SIGNAL(triggered()),this,SLOT(slot_AddNET()));
+    QAction *pProtocolExplanation = new QAction(tr("驱动说明"),SwitchMenu);
+    connect(pProtocolExplanation,SIGNAL(triggered()),this,SLOT(slot_ProtocolExplanation()));
 
     SwitchMenu->addAction(pAddDevice);
     SwitchMenu->addAction(pDeleteChannel);
-//    SwitchMenu->addAction(pAddNET);
+    SwitchMenu->addAction(pProtocolExplanation);
     SwitchMenu->addSeparator();
     //-> 运行菜单
     SwitchMenu->exec(QCursor::pos());
@@ -135,6 +138,11 @@ bool CGI_SCADA_DLL_TreeItemNetLink::setLinkElem(const QDomElement &LinkElem_)
     }
     return true;
 }
+
+void CGI_SCADA_DLL_TreeItemNetLink::slot_ChangeProtocolName(QString strProtocolName)
+{
+    m_strProtocolName = QString("conf/Explanation/%1.txt").arg(strProtocolName);
+}
 void CGI_SCADA_DLL_TreeItemNetLink::slot_AddDevice()
 {
     qDebug()<<__func__;
@@ -176,6 +184,30 @@ void CGI_SCADA_DLL_TreeItemNetLink::slot_DeleteChannel()
     {
         emit signal_DeleteChannl();
         deleteLater();
+    }
+}
+
+void CGI_SCADA_DLL_TreeItemNetLink::slot_ProtocolExplanation()
+{
+    QString strCommand = QString("notepad ") + m_strProtocolName;
+    QFile file(m_strProtocolName);
+
+    if (file.exists())
+    {
+        qDebug()<<__func__<<__LINE__<<strCommand<<m_strProtocolName;
+//        QProcess process;
+        if (m_Process.isOpen())
+        {
+            m_Process.close();
+        }else
+        {
+
+        }
+        m_Process.start(QString("notepad"),QStringList()<<m_strProtocolName);
+//        system(strCommand.toStdString().data());/// 需要将此运行放入新的线程中，解决界面卡死的问题,或者使用QProcess试试看可以不
+    }else
+    {
+        qDebug()<<__func__<<__LINE__<<strCommand<<m_strProtocolName;
     }
 }
 CGI_SCADA_DLL_TreeItemNetLink::~CGI_SCADA_DLL_TreeItemNetLink()

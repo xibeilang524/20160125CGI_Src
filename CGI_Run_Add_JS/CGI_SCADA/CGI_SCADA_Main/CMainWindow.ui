@@ -37,6 +37,7 @@
     <addaction name="actionExtract"/>
     <addaction name="actionUpload"/>
     <addaction name="actionDownload"/>
+    <addaction name="actionReadMe"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -97,6 +98,11 @@
   <action name="actionDownload">
    <property name="text">
     <string>Download</string>
+   </property>
+  </action>
+  <action name="actionReadMe">
+   <property name="text">
+    <string>ReadMe</string>
    </property>
   </action>
  </widget>

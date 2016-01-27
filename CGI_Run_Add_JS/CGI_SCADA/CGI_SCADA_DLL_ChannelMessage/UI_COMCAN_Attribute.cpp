@@ -848,6 +848,7 @@ void UI_COMCAN_Attribute::slot_propertyChange(QtProperty *property)
                     continue;
                 qDebug()<<__func__<<__LINE__<<__FILE__<<property->valueText();
                 QString strProtocolName = property->valueText();
+                emit signal_ChangeProtocolName(strProtocolName);
                 SetProtocolName(strProtocolName);
                 if (strProtocolName.contains("Deliver"))
                 {

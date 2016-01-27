@@ -14,6 +14,7 @@ CGI_SCADA_DLL_TreeItemCAN::CGI_SCADA_DLL_TreeItemCAN(int nCanNumber_, QTreeWidge
     m_pMainWidget = new UI_COMCAN_Attribute(TreeItemType_ChanneM_CAN_Attribute);
     connect(m_pMainWidget,SIGNAL(signal_ProtocolTypeChange(int)),this,SIGNAL(signal_ProtocolTypeChange(int)));
     connect(m_pMainWidget,SIGNAL(signal_ProtocolTypeChange(int)),this,SLOT(slot_ProtocolTypeChange(int)));
+    connect(m_pMainWidget,SIGNAL(signal_ChangeProtocolName(QString)),this,SLOT(slot_ChangeProtocolName(QString)));
 
 //    m_pAttributeItem = new CGI_SCADA_DLL_TreeItemComCanAttribute(this,QStringList()<<"属性",TreeItemType_ChanneM_CAN_Attribute,this);
 //    connect(m_pAttributeItem,SIGNAL(signal_ProtocolTypeChange(int)),this,SLOT(slot_ProtocolTypeChange(int)));
@@ -59,10 +60,13 @@ void CGI_SCADA_DLL_TreeItemCAN::GetPopUpMenu()
 //    QAction *pAddNET = new QAction(tr("添加NET"),SwitchMenu);
 //    connect(pAddNET,SIGNAL(triggered()),this,SLOT(slot_AddNET()));
 
+    QAction *pProtocolExplanation = new QAction(tr("驱动说明"),SwitchMenu);
+    connect(pProtocolExplanation,SIGNAL(triggered()),this,SLOT(slot_ProtocolExplanation()));
+
     SwitchMenu->addAction(pAddDevice);
     SwitchMenu->addAction(pDeleteChannel);
     SwitchMenu->addAction(pSetEnable);
-//    SwitchMenu->addAction(pAddNET);
+    SwitchMenu->addAction(pProtocolExplanation);
     SwitchMenu->addSeparator();
     //-> 运行菜单
     SwitchMenu->exec(QCursor::pos());
@@ -161,6 +165,11 @@ bool CGI_SCADA_DLL_TreeItemCAN::SetBuildTagMap(const QMap<QString, QStringList> 
 QWidget *CGI_SCADA_DLL_TreeItemCAN::GetWidget(QTreeWidgetItem *pItem_)
 {
     return m_pMainWidget;
+}
+
+void CGI_SCADA_DLL_TreeItemCAN::slot_ChangeProtocolName(QString strProtocolName)
+{
+    m_strProtocolName = QString("conf/Explanation/%1.txt").arg(strProtocolName);
 }
 
 bool CGI_SCADA_DLL_TreeItemCAN::SetChannelFile(QString strFileName_)
@@ -304,4 +313,27 @@ void CGI_SCADA_DLL_TreeItemCAN::slot_SetEnable(bool enable)
             this->setDisabled(true);
         }
 //    }
+}
+
+void CGI_SCADA_DLL_TreeItemCAN::slot_ProtocolExplanation()
+{
+    QString strCommand = QString("notepad ") + m_strProtocolName;
+    QFile file(m_strProtocolName);
+    if (file.exists())
+    {
+        qDebug()<<__func__<<__LINE__<<strCommand<<m_strProtocolName;
+//        QProcess process;
+        if (m_Process.isOpen())
+        {
+            m_Process.close();
+        }else
+        {
+
+        }
+        m_Process.start(QString("notepad"),QStringList()<<m_strProtocolName);
+//        system(strCommand.toStdString().data());/// 需要将此运行放入新的线程中，解决界面卡死的问题,或者使用QProcess试试看可以不
+    }else
+    {
+        qDebug()<<__func__<<__LINE__<<strCommand<<m_strProtocolName;
+    }
 }

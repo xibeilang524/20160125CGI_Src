@@ -420,3 +420,8 @@ void CMainWindow::on_actionBuild_triggered()
     }
     emit signal_ShowMessageDebug(0,tr("编译结束"));
 }
+
+void CMainWindow::on_actionReadMe_triggered()
+{
+    system("notepad  readme.txt");
+}
