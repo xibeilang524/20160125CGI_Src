@@ -115,7 +115,6 @@ private://函数
     void InCrease(WORD &nValue);
     void ResetDataLink();
     void Send_S_Frame(WORD nReceiveNo);
-    void ProcessASDU101Type_C_CI_NA_1(ASDU101 &asdu);
     void ProcessASDU101Type_C_CS_NA_1(ASDU101 &asdu);
     void ProcessASDU101Type_C_SC_NA_1(WORD nTransmissionCause, int nPointAddress, BYTE nSCO);
     void ProcessASDU101Type_C_SC_NA_1(ASDU101 &asdu);
@@ -123,6 +122,7 @@ private://函数
     void ProcessASDU101Type_C_DC_NA_1(WORD nTransmissionCause,int nPointAddress, BYTE nSCO);
     void ProcessASDU101Type_YS(ASDU101 &asdu);
 
+    /// new cgi deliver iec 104
     void ProcessASDU101Type_C_IC_NA_1(CIEC104DeliverQuery_new &Query_);
     bool Send_C_IC_NA_1(WORD &nSendNo,WORD nReceiveNo,BYTE nCommonAddress,BYTE nReason);
     bool Send_C_IC_NA_1_YX(WORD &nSendNo,WORD nReceiveNo,BYTE nCommonAddress,BYTE nReason,CGI_D_IEC_104_PublicAddress_Node *pPublicAddressPointNode_);
@@ -134,30 +134,47 @@ private://函数
     bool Send_C_IC_NA_1_YC_M_ME_NC_1(WORD &nSendNo,WORD nReceiveNo,BYTE nCommonAddress,BYTE nReason,QMap<int,CGI_D_IEC_104_PointYC *> *pPointMap);
     bool Send_C_IC_NA_1_YC_M_ME_ND_1(WORD &nSendNo,WORD nReceiveNo,BYTE nCommonAddress,BYTE nReason,QMap<int,CGI_D_IEC_104_PointYC *> *pPointMap);
 
+    void ProcessASDU101Type_C_CI_NA_1(CIEC104DeliverQuery_new &Query_);
+    bool Send_C_CI_NA_1(WORD &nSendNo,WORD nReceiveNo,BYTE nCommonAddress,BYTE nReason);
+    bool Send_C_CI_NA_1_YM(WORD &nSendNo,WORD nReceiveNo,BYTE nCommonAddress,BYTE nReason,CGI_D_IEC_104_PublicAddress_Node *pPublicAddressPointNode_);
+    bool Send_C_CI_NA_1_YM_M_IT_NA_1(WORD &nSendNo,WORD nReceiveNo,BYTE nCommonAddress,BYTE nReason,QMap<int,CGI_D_IEC_104_PointYM *> *pPointMap);
+
+
     bool Send_IntrogenCallDDLActivationOK(WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress);
     bool Send_IntrogenCallDDLActivationEnd(WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress);
     bool Send_I_C_CS_NA_1(WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress);
 
     bool MakeQuery_I(WORD &nSendNo, WORD nReceiveNo, BYTE *pAsdu, int nAsduSize);
 
-    bool Send_I_YX (WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress);
-    bool Send_I_YC (WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress);
-    bool Send_I_YM (WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress);
 
     bool SendFrame(const BYTE *pSource_, int nLength_);
     void SendFrame();
 
     void YC_Change(CPointBase *pPointBase_,QVariant VarSet_);
     void YX_Change(CPointBase *pPointBase_,QVariant VarSet_);
+    void YM_Change(CPointBase *pPointBase_,QVariant VarSet_);
+
+    bool ProcessASDU101Type_C_SC_NA_1(CIEC104DeliverQuery_new &Query_);
+    bool ProcessASDU101Type_C_DC_NA_1(CIEC104DeliverQuery_new &Query_);
 signals:
     void SignalMakeQuery_I_YX_ChangeYX(CPointBase *pPointBase_, QVariant VarSet_);
     void SignalMakeQuery_I_YC_ChangeYC(CPointBase *pPointBase_, QVariant VarSet_);
+    void SignalMakeQuery_I_YM_ChangeYM(CPointBase *pPointBase_, QVariant VarSet_);
 private slots:
     bool MakeQuery_I_YX_ChangeYX(CPointBase *pPointBase_, QVariant VarSet_);
     bool MakeQuery_I_YC_ChangeYC(CPointBase *pPointBase_, QVariant VarSet_);
+    bool MakeQuery_I_YM_ChangeYM(CPointBase *pPointBase_, QVariant VarSet_);
 private:
     bool Send_U_Command(bool bStart_, bool bStop_, bool bTest_);
 
+    bool Make_I_YX_M_SP_TB_1(CGI_D_IEC_104_PointYX *pPoint_);
+    bool Make_I_YX_M_DP_TB_1(CGI_D_IEC_104_PointYX *pPoint_);
+
+    bool Make_I_YC_M_ME_TD_1(CGI_D_IEC_104_PointYC *pPoint_);
+    bool Make_I_YC_M_ME_TE_1(CGI_D_IEC_104_PointYC *pPoint_);
+    bool Make_I_YC_M_ME_TF_1(CGI_D_IEC_104_PointYC *pPoint_);
+
+    bool Make_I_YM_M_IT_TB_1(CGI_D_IEC_104_PointYM *pPoint_);
 private://变量
     CGI_D_IEC_104_PointNode m_PointNode;
     enum{MAX_FRAME=1024*10};

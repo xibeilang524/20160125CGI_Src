@@ -112,13 +112,13 @@ QMap<int, CGI_D_IEC_104_PointYC *> *CGI_D_IEC_104_PublicAddress_Node::Get_YC_Poi
 
 QMap<int, CGI_D_IEC_104_PointYM *> *CGI_D_IEC_104_PublicAddress_Node::Get_YM_PointMap(ASDU101_TYPE nType)
 {
-    Q_ASSERT(nType == M_IT_NA_1);
-    switch (nType) {
-    case M_IT_NA_1:
+//    Q_ASSERT(nType == M_IT_NA_1);
+//    switch (nType) {
+//    case M_IT_NA_1:
         return &YM_M_IT_NA_1_PointMap;
-    default:
-        return NULL;
-    }
+//    default:
+//        return NULL;
+//    }
 }
 
 QMap<int, CGI_D_IEC_104_PointYK *> *CGI_D_IEC_104_PublicAddress_Node::Get_YK_PointMap()

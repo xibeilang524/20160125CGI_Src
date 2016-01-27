@@ -58,6 +58,7 @@
 
 #define IEC104_WAITSETMEASPARA                  60
 //////////////////////////////////////////////////////////////////////////
+
 /*!
  * \enum   ASDU101_TYPE
  * \brief  概述 定义ASDU101类型标识
@@ -347,35 +348,6 @@ public:
         <2> := ON
         <3> := not permitted */
     BYTE	DCS: 2;///< Double command state <0> := not permitted <1> := OFF <2> := ON <3> := not permitted
-
-    BYTE	QU : 5; ///< <0> := no additional definition
-                    ///< <1> := short pulse duration (circuit-breaker),duration determined by a system parameter in the outstation
-                    ///< <2> := long duration pulse,mduration determined by a system parametert in the outstation
-                    ///< <3> := persistent output
-                    ///< <4..8>	:= reserved for standard definitions of this companion standard (compatible range)
-                    ///< <9..15>	:= reserved for the selection of other predefined functions
-                    ///< <16..31> := reserved for special use (private range)
-
-    BYTE	S_E: 1; ///<	<0> := Excute
-                    ///< <1> := Select
-public:
-    int GetSize(){return 1;}
-};
-/*!
- \brief 7.2.6.15单命令[IEV-371-03-02] (SCO)
-
- \class ASDU101_SCO IEC_104.h "IEC_104.h"
-*/
-struct ASDU101_SCO
-{
-public:
-    /* Double command state
-        <0> := not permitted
-        <1> := OFF
-        <2> := ON
-        <3> := not permitted */
-    BYTE	SCS: 1; ///< <O> := OFF <1> := ON
-    BYTE	RES: 1; ///< BAOLIU
 
     BYTE	QU : 5; ///< <0> := no additional definition
                     ///< <1> := short pulse duration (circuit-breaker),duration determined by a system parameter in the outstation

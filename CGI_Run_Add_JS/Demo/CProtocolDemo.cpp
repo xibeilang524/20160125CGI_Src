@@ -197,6 +197,7 @@ void CProtocolDemo::CGI_InitPointNode(const QDomElement &DeviceListElement_)
                         {
                             pPoint->m_pTag->SetCollection(pPoint);///设置采集点
                         }
+                        qDebug()<<__func__<<__LINE__<<pPoint->m_pTag->GetPointCollection()->GetValue()->GetVarValue();
                         qDebug()<<"LinkName 3:"<<pPoint->m_strRTDBName;
 
                         int Function = tagElement.attribute("Device_YC_Function_Strings").toInt();

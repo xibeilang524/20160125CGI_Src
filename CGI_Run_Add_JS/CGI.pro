@@ -10,7 +10,8 @@ SUBDIRS += \
     CDT \
     CGI_Run \
     CGI_HDB \
-    IEC-104 \
+    CGI_IEC_104 \
+#    IEC-104 \
     CGI_RTDB \
     CGI_RTDB_web3 \
     ServerRun \
@@ -30,12 +31,12 @@ SUBDIRS += \
     MonitorDeliverIEC-104 \
     RTFrameSharedMemoryLib \
     CGI_JavaScript_DataChange \
-    CGI_JavaScript_Timing \
-    CGI_SCADA
+    CGI_JavaScript_Timing
 
 win32 {
     SUBDIRS += CGI_Monitor \
-    CGI_SCADA_WEB
+    CGI_SCADA_WEB \
+    CGI_SCADA
 
 }
 unix {

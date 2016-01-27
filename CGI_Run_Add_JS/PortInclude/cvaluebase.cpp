@@ -107,7 +107,6 @@ CValueBase::CValueBase(char */*pString*/, int /*nTime_*/, int /*nQulity_*/)
  */
 void CValueBase::SetVarValue(const QVariant varValue_)
 {
-//    qDebug()<<varValue_;
     m_varValue = varValue_;
 }
 

@@ -246,6 +246,7 @@ void CTcpServer::Slot_TcpServer_newConnection()
         connect(m_pTcpServer_TcpSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(Slot_TcpServer_TcpSocket_error(QAbstractSocket::SocketError)));
         connect(m_pTcpServer_TcpSocket,SIGNAL(disconnected()),m_pTcpServer_TcpSocket,SLOT(deleteLater()));
         m_nTcpClientLastReceiveTime = GetSysAbsTime();
+        emit Signal_ConnectState(m_bTcpServer_TcpSocket_IsConnect);
     }
 }
 
@@ -260,6 +261,7 @@ void CTcpServer::Slot_TcpServer_TcpSocket_disconnected()
 {/// 后 2
     m_bTcpServer_TcpSocket_IsConnect = false;
     qDebug()<<__func__<<"m_pTcpSocket="<<m_pTcpServer_TcpSocket;
+    emit Signal_ConnectState(m_bTcpServer_TcpSocket_IsConnect);
 }
 
 int CTcpServer::Absolute(int nValue_)
