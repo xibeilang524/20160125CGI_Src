@@ -658,8 +658,8 @@ void CProtocolIEC_104::slotConnect(bool isConnected_)
  \brief YS处理函数
 
  \fn CProtocolIEC_104::slot_YS_Change
- \param pPointBase_
- \param VarSet_
+ \param pPointBase_ 改变的点
+ \param VarSet_ 改变的值
 */
 void CProtocolIEC_104::slot_YS_Change(CPointBase *pPointBase_, QVariant VarSet_)
 {
