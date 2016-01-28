@@ -695,6 +695,8 @@ void CProtocolIEC_104::slot_YK_Change(CPointBase *pPointBase_, QVariant VarSet_)
 /// 11111111111
 /// 2222222
 qDebug()<<12;
+qDebug()<<13;
+    qDebug()<<pPointBase_->m_strRTDBName;
 }
 
 /*!
