@@ -692,7 +692,9 @@ void CProtocolIEC_104::slot_YS_Change(CPointBase *pPointBase_, QVariant VarSet_)
 */
 void CProtocolIEC_104::slot_YK_Change(CPointBase *pPointBase_, QVariant VarSet_)
 {
-
+/// 11111111111
+/// 2222222
+qDebug()<<12;
 }
 
 /*!
