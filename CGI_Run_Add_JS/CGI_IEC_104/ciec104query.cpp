@@ -298,6 +298,59 @@ bool CIEC104Query::MakeQuery_I_YS(WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAd
     return MakeQuery_I(nSendNo,nReceiveNo,szSend, pCur-szSend);
 }
 
+bool CIEC104Query::MakeQuery_I_YK(WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress, ASDU101_TYPE nType, BYTE nYKOutType,BYTE nSelectExcute, unsigned int nPointNumber, QVariant varValue)
+{
+    BYTE szSend[BUFFER_SIZE] = {0};
+    BYTE *pCur = szSend;
+    *pCur++ = nType;//
+    *pCur++ = 1;   //结构限定词
+    *pCur++ = 6;   //传输原因 6=激活  8停止激活
+    *pCur++ = 0; //传输原因高位
+
+    *pCur++ = nCommonAddress;//公共地址 (一般为子站地址)
+    *pCur++ = 0; //公共地址高位
+
+    *pCur++ = nPointNumber & 0x000000ff;        //信息体地址低位
+    *pCur++ = (nPointNumber & 0x0000ff00)>>8;   //信息体地址高位
+    *pCur++ = (nPointNumber & 0x00ff0000)>>16;  //信息体地址高位
+
+    switch (nType) {
+    case C_SC_NA_1:
+    {
+        ASDU101_SCO *pSco = (ASDU101_SCO *)pCur;
+        pSco->SCS = varValue.toUInt();
+        pSco->RES = 0;
+        pSco->QU  = nYKOutType;
+        pSco->S_E = nSelectExcute;
+        pCur += pSco->GetSize();
+    }
+        break;
+    case C_DC_NA_1:
+    {
+        ASDU101_DCO *pDco = (ASDU101_DCO *)pCur;
+        pDco->DCS = varValue.toUInt();
+        pDco->QU  = nYKOutType;
+        pDco->S_E = nSelectExcute;
+        pCur += pDco->GetSize();
+    }
+        break;
+    case C_RC_NA_1:
+    {
+        ASDU101_RCO *pRco = (ASDU101_RCO *)pCur;
+        pRco->RCS = varValue.toUInt();
+        pRco->QU  = nYKOutType;
+        pRco->S_E = nSelectExcute;
+        pCur += pRco->GetSize();
+    }
+        break;
+    default:
+        break;
+    }
+
+    return MakeQuery_I(nSendNo,nReceiveNo,szSend, pCur-szSend);
+
+}
+
 /*!
  * \brief  功能概述 获取报文帧
  * \param  参数描述 无

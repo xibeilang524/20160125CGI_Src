@@ -37,6 +37,8 @@ public:
     BYTE            m_nOut_Type;    ///< 输出类型
 
     ASDU101_TYPE    m_nYS_Type;     ///< 遥设类型
+
+    BYTE  m_nS_E; ///< 选择和执行的状态 对于遥控和遥设来说
 };
 
 #endif // CPOINTIEC_104_H

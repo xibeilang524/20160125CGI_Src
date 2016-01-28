@@ -473,8 +473,7 @@ bool CProtocolDemo::ChangeValue(CPointDemoBase *pPoint)
     case 82://遥信量  参数为:82每次变位的可能性(0-100)
         GetRand(pPoint);
         break;
-    case 86://遥信量  参数为:82每次变位的可能性(0-100)
-//        GetRand(pPoint);
+    case 86://值不受Demo驱动控制
         break;
     default:
         Q_ASSERT(false);//"未定义的取值方式\n"

@@ -147,6 +147,7 @@ private://函数
     void init104Param();
     void setConfigProtocolInitParam(const AAALinkLayerConfigInfo &para);
 private://解析I帧
+    void ProcessASDU101_Type_YK(ASDU101 *pAsdu);
     void ProcessASDU101_Type232(ASDU101 &asdu);
     void ProcessASDU101_Type021(ASDU101 &asdu);
     void ProcessASDU101_Type020(ASDU101 &asdu);

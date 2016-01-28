@@ -40,6 +40,7 @@ public:
     bool MakeQuery_AdjustTime(WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress);
     bool MakeQuery_RemoteControl(WORD &nSendNo,WORD nReceiveNo, BYTE nCommonAddress,int nPoint, bool bValue,int nStep);
     bool MakeQuery_I_YS(WORD &nSendNo,WORD nReceiveNo, BYTE nCommonAddress,ASDU101_TYPE nType,unsigned int nPointNumber, QVariant varValue);
+    bool MakeQuery_I_YK(WORD &nSendNo,WORD nReceiveNo, BYTE nCommonAddress,ASDU101_TYPE nType,BYTE nYKOutType,BYTE nSelectExcute,unsigned int nPointNumber, QVariant varValue);
     const QByteArray &GetByteArrayFrame();
 private:
     bool MakeQuery_I(WORD &nSendNo,WORD nReceiveNo, BYTE *pAsdu, int nAsduSize);

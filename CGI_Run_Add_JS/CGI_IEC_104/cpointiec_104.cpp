@@ -24,6 +24,7 @@
  */
 CPointIEC_104::CPointIEC_104()
 {
+    m_nS_E = 5;///< init this value
 }
 
 /*!

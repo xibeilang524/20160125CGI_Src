@@ -687,16 +687,32 @@ void CProtocolIEC_104::slot_YS_Change(CPointBase *pPointBase_, QVariant VarSet_)
  \brief YK处理函数
 
  \fn CProtocolIEC_104::slot_YK_Change
- \param pPointBase_ aaaaaa
- \param VarSet_ aaaaaaaa
+ \param pPointBase_
+ \param VarSet_
 */
 void CProtocolIEC_104::slot_YK_Change(CPointBase *pPointBase_, QVariant VarSet_)
 {
-/// 11111111111
-/// 2222222
-qDebug()<<12;
-qDebug()<<13;
-    qDebug()<<pPointBase_->m_strRTDBName;
+    if (pPointBase_->m_nTagType == TAG_TYPE_DO)
+    {
+        CPointIEC_104 *pPoint = (CPointIEC_104*)pPointBase_;
+        switch (pPoint->m_nYK_Type) {
+        case C_SC_NA_1:
+        case C_DC_NA_1:
+        case C_RC_NA_1:
+        {
+            pPoint->m_nS_E = 1;///< 在接收到遥控选择报文时查看此状态位是否为1，如果是1则下发遥控执行报文，否则不做处理
+            BYTE  nSelect = 1;///< 先选择，再执行，先下发选择报文，在收到返回回来的选择指令时下发执行报文
+            m_IEC104Query.MakeQuery_I_YK(m_nSendIdx,m_nReciveIdx,m_nCommonAddress,pPoint->m_nYK_Type,pPoint->m_nOut_Type,nSelect,pPoint->m_nPointNumber,VarSet_);
+            SendFrame(m_IEC104Query);
+        }
+            break;
+        default:
+            break;
+        }
+    }else
+    {
+
+    }
 }
 
 /*!
@@ -1248,6 +1264,91 @@ void CProtocolIEC_104::setConfigProtocolInitParam(const AAALinkLayerConfigInfo &
     m_bConfigInitParamOk = true; //配置完成
 }
 
+void CProtocolIEC_104::ProcessASDU101_Type_YK(ASDU101 *pAsdu)
+{
+    bool result = false;
+    quint32 nPointNumber = pAsdu->GetPoint(pAsdu->m_pInfo);
+    WORD dwReason = pAsdu->REASON;
+    CPointIEC_104 *pPoint = NULL;
+    QVariant VarSet_;
+    if (dwReason != ASDU101_TR_ACTCON)
+    {
+        return ;
+    }
+    if (YK_PointMap.contains(nPointNumber))
+    {
+        pPoint = YK_PointMap.value(nPointNumber);
+        if (pPoint->m_nYK_Type == pAsdu->m_nType)
+        {
+            if (pPoint->m_nS_E != 1)
+            {
+                return;
+            }else
+            {
+                switch (pAsdu->m_nType) {
+                case C_SC_NA_1:
+                {
+                    ASDU101_SCO *pSco = (ASDU101_SCO *)(pAsdu+9);
+                    if (pSco->S_E != 1)
+                    {
+                        return;
+                    }else
+                    {
+                        VarSet_ = QVariant(pSco->SCS);
+                        result = true;
+                    }
+
+                }
+                    break;
+                case C_DC_NA_1:
+                {
+                    ASDU101_DCO *pDco = (ASDU101_DCO *)(pAsdu+9);
+                    if (pDco->S_E != 1)
+                    {
+                        return;
+                    }else
+                    {
+                        VarSet_ = QVariant(pDco->DCS);
+                        result = true;
+                    }
+                }
+                    break;
+                case C_RC_NA_1:
+                {
+                    ASDU101_RCO *pRco = (ASDU101_RCO *)(pAsdu+9);
+                    if (pRco->S_E != 1)
+                    {
+                        return;
+                    }else
+                    {
+                        VarSet_ = QVariant(pRco->RCS);
+                        result = true;
+                    }
+                }
+                    break;
+                default:
+                    return;
+                    break;
+                }
+            }
+        }else
+        {
+
+        }
+    }else
+    {
+
+    }
+
+    if (result)
+    {
+        pPoint->m_nS_E = 1;///< 在接收到遥控选择报文时查看此状态位是否为1，如果是1则下发遥控执行报文，否则不做处理
+        BYTE  nSelect = 1;///< 先选择，再执行，先下发选择报文，在收到返回回来的选择指令时下发执行报文
+        m_IEC104Query.MakeQuery_I_YK(m_nSendIdx,m_nReciveIdx,m_nCommonAddress,pPoint->m_nYK_Type,pPoint->m_nOut_Type,nSelect,pPoint->m_nPointNumber,VarSet_);
+        SendFrame(m_IEC104Query);
+    }
+}
+
 /*!
  * \brief  功能概述 发送启动U帧 连接链路
  * \param  参数描述 无
@@ -1520,14 +1621,10 @@ void CProtocolIEC_104::DecodeIFrame(CIEC104Response_new &response)
         break;
     case C_IC_NA_1://召唤命令返回
         break;
-    case C_DC_NA_1://遥控返回
-//        if(m_pTagControl != NULL)
-//        {
-//            if(pAsdu->m_reason == 7)//确定
-//                m_pTagControl->SetResult(true);//SetComandReturn(0x010e,"命令成功");
-//            else
-//                m_pTagControl->SetResult(false);//SetComandReturn(0x010f,"命令失败");
-//        }
+    case C_SC_NA_1:
+    case C_DC_NA_1:
+    case C_RC_NA_1:
+        ProcessASDU101_Type_YK(pAsdu);
         break;
     default:
 //        TRACE("未处理类型:%d\n",pAsdu->m_nType);
