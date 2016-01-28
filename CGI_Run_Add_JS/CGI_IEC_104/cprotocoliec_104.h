@@ -113,16 +113,16 @@ public slots:
     virtual void slotConnect(bool);
 //! end
 //!
-private:
-//    QTcpSocket *m_pTcpSocket;
-//    QString m_strTcpIp;
-//    int m_nPort;
-
+signals:
+    void signal_YS_Change(CPointBase *pPointBase_, QVariant VarSet_);
+    void signal_YK_Change(CPointBase *pPointBase_, QVariant VarSet_);
+private slots:
+    void slot_YS_Change(CPointBase *pPointBase_, QVariant VarSet_);
+    void slot_YK_Change(CPointBase *pPointBase_, QVariant VarSet_);
 
 /** * IEC-104驱动部分
  * */
 private://函数
-    void InitPointMap(const QDomElement &DeviceListElement_);
     void CGI_InitPointMap(const QDomElement &DeviceListElement_);
     void InsertPoint(const QDomElement &PointElem_, int nPointType, int nDeviceAddress);
     void CGI_InsertPoint(const QDomElement &PointElem_, int nPointType, int nDeviceAddress);

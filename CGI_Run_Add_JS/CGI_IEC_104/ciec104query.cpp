@@ -233,6 +233,72 @@ bool CIEC104Query::MakeQuery_RemoteControl(WORD &nSendNo, WORD nReceiveNo, BYTE 
 }
 
 /*!
+ \brief 合成遥设报文
+
+ \fn CIEC104Query::MakeQuery_I_YS
+ \param nSendNo
+ \param nReceiveNo
+ \param nCommonAddress
+ \param nPoint
+ \param nValue
+ \return bool
+*/
+bool CIEC104Query::MakeQuery_I_YS(WORD &nSendNo, WORD nReceiveNo, BYTE nCommonAddress,ASDU101_TYPE nType, unsigned int nPointNumber, QVariant varValue)
+{
+    BYTE szSend[BUFFER_SIZE] = {0};
+    BYTE *pCur = szSend;
+    *pCur++ = nType;//
+    *pCur++ = 1;   //结构限定词
+    *pCur++ = 6;   //传输原因 6=激活  8停止激活
+    *pCur++ = 0; //传输原因高位
+
+    *pCur++ = nCommonAddress;//公共地址 (一般为子站地址)
+    *pCur++ = 0; //公共地址高位
+
+    *pCur++ = nPointNumber & 0x000000ff;        //信息体地址低位
+    *pCur++ = (nPointNumber & 0x0000ff00)>>8;   //信息体地址高位
+    *pCur++ = (nPointNumber & 0x00ff0000)>>16;  //信息体地址高位
+
+    switch (nType) {
+    case C_SE_NA_1:
+    {
+        ASDU101_NVA *pNva = (ASDU101_NVA *)pCur;
+        pNva->m_nValue = varValue.toInt();
+        pCur += pNva->GetSize();
+    }
+        break;
+    case C_SE_NB_1:
+    {
+        ASDU101_SVA *pSva = (ASDU101_SVA *)pCur;
+        pSva->m_nValue = varValue.toInt();
+        pCur += pSva->GetSize();
+    }
+        break;
+    case C_SE_NC_1:
+    {
+        ASDU101_R32 *pR32 = (ASDU101_R32 *)pCur;
+        pR32->m_nValue = varValue.toFloat();
+        pCur += pR32->GetSize();
+    }
+        break;
+    case C_SE_ND_1:
+    {
+
+    }
+        break;
+    default:
+        break;
+    }
+
+    ASDU101_QOS *pQos = (ASDU101_QOS *)pCur;
+    pQos->QL = 0;
+    pQos->SE = 0;///< 0 转发遥设直接执行
+    pCur += pQos->GetSize();
+
+    return MakeQuery_I(nSendNo,nReceiveNo,szSend, pCur-szSend);
+}
+
+/*!
  * \brief  功能概述 获取报文帧
  * \param  参数描述 无
  * \return 返回值描述 返回报文帧

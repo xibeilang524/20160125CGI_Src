@@ -49,19 +49,9 @@ CProtocolI * CreateDriver(QObject *parent)
  */
 CProtocolIEC_104::CProtocolIEC_104(QObject */*parent*/)
 {
-
-//    DebugIEC104File.setFileName("DebugInfo/Iec104DebugInfo.txt");
-//    if (!DebugIEC104File.open(QFile::ReadWrite | QFile::Text | QIODevice::Append))
-//    {
-//        QString str("DebugInfo");
-//        QDir::current().mkdir(str);
-//        DebugIEC104File.open(QFile::ReadWrite | QFile::Text | QIODevice::Append);
-//    }
     m_bTimerIsStart = false;
     m_nLinkCount = 0;///<zzy 2015/1/14 修改:
 
-//    m_strTcpIp = "";
-//    m_nPort = -1;
     m_bConnectOk = false;
     m_nReciveIdx = 0;
     m_nSendIdx = 0;
@@ -76,16 +66,7 @@ CProtocolIEC_104::CProtocolIEC_104(QObject */*parent*/)
 
     m_nMaxSRValue=32767;//收发最大值
     m_bDataLink = false;
-//	m_pTagControl = NULL;
-//	m_nTimeouts = 10;
-//	m_nAddress = 1;
-//	m_bNeedSendUFrame = false;
     m_nUnconfirmIFrame = 0;
-
-//    m_pTcpSocket = new QTcpSocket;
-//    connect(m_pTcpSocket,SIGNAL(readyRead()),this,SLOT(ProcessRespond()));
-//    connect(m_pTcpSocket,SIGNAL(connected()),this,SLOT(OnConnected()));
-//    connect(m_pTcpSocket,SIGNAL(error(QAbstractSocket::SocketError)),this,SLOT(displayError(QAbstractSocket::SocketError)));
 }
 
 /*!
@@ -97,60 +78,6 @@ CProtocolIEC_104::CProtocolIEC_104(QObject */*parent*/)
  */
 bool CProtocolIEC_104::OnCreateChannel(const QString strChannelFileName_, CRTDBI *pDatabaseReturn)
 {
-    SetPROTOCOL_TYPE(Collect_Type);
-    if (!CProtocolBase::OnCreateChannel(strChannelFileName_,pDatabaseReturn))
-        return false;
-
-    QFile file(strChannelFileName_);
-    QDomDocument ChannelDoc;
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-        return false;
-    QString errorStr;
-    int errorLine;
-    int errorColumn;
-    if (!ChannelDoc.setContent(&file, false, &errorStr, &errorLine, &errorColumn))
-    {
-        qDebug()<<strChannelFileName_<<"XML文件中错误信息:"<<errorStr<<" 错误行号:"<<errorLine<<" 错误列号:"<<errorColumn;
-        return false;
-    }
-    file.close();
-
-    QDomElement docElem = ChannelDoc.documentElement();
-    if (docElem.childNodes().count() != 5)///<zzy 2015/1/15 修改:
-        return false;
-    QDomElement Channel    = docElem.childNodes().at(0).toElement();
-    QDomElement Top        = docElem.childNodes().at(1).toElement();
-    QDomElement Protocol   = docElem.childNodes().at(2).toElement();
-    QDomElement MainPort   = docElem.childNodes().at(3).toElement();
-    QDomElement DeviceList = docElem.childNodes().at(4).toElement();
-
-    g_param.strTransmitCauseLen = Protocol.attribute("TransmitCauseLen"); //传送原因地址长度
-    g_param.strCommAddrLen = Protocol.attribute("CommAddrLen"); //公共地址长度
-    g_param.strInfoAddrLen = Protocol.attribute("InfoAddrLen"); //信息体地址长度
-    g_param.strTimeType = Protocol.attribute("TimeType");    //时标格式
-    g_param.strTimingType = Protocol.attribute("TimingType");  //校时方式
-    g_param.strCallingType = Protocol.attribute("CallingType"); //总召唤方式
-//    g_param.strLinkTimeOut = Protocol.attribute("LinkTimeOut");///<zzy 2015/1/14 修改: //连接超时
-    g_param.strLinkTimeOut = Protocol.attribute("t0");///<zzy 2015/1/14 修改: //连接超时
-//    g_param.strSendFrameTimeOut = Protocol.attribute("SendFrameTimeOut");///<zzy 2015/1/14 修改: //发送或测试超时
-    g_param.strSendFrameTimeOut = Protocol.attribute("t1"); //发送或测试超时
-//    g_param.strNonDataTimeOut = Protocol.attribute("NonDataTimeOut");///<zzy 2015/1/14 修改:  //无数据超时
-    g_param.strNonDataTimeOut = Protocol.attribute("t2");///<zzy 2015/1/14 修改:  //无数据超时
-//    g_param.strSendSFrameTimeOut = Protocol.attribute("SendSFrameTimeOut");///<zzy 2015/1/14 修改: //S帧发送超时
-    g_param.strSendSFrameTimeOut = Protocol.attribute("t3");///<zzy 2015/1/14 修改: //S帧发送超时
-//    g_param.strMaxFrameInx = Protocol.attribute("MaxFrameInx");///<zzy 2015/1/14 修改: //最大不同接收序号
-    g_param.strMaxFrameInx = Protocol.attribute("K");///<zzy 2015/1/14 修改: //最大不同接收序号
-//    g_param.strSFrameConfirm = Protocol.attribute("SFrameConfirm");///<zzy 2015/1/14 修改: //最大S帧确认数
-    g_param.strSFrameConfirm = Protocol.attribute("W");///<zzy 2015/1/14 修改: //最大S帧确认数
-    g_param.strASDULen = Protocol.attribute("ASDULen"); //ASDU数据单元长度
-    g_param.strKwhCjType = Protocol.attribute("KwhCjType"); //累积量采集方式
-//    SetFunctionMap(DeviceList);///初始化点表Map
-//    SetInitSend_RX_RC_FrameList();///初始化采集信息报文
-//    m_strTcpIp = MainPort.attribute("IP");
-//    m_nPort = MainPort.attribute("Port").toInt();
-
-    InitPointMap(DeviceList);
-    init104Param();
     return true;
 }
 
@@ -188,13 +115,7 @@ bool CProtocolIEC_104::OnCreateChannel(const QDomElement &ChannelElement_, Chann
     g_param.strSFrameConfirm = Protocol.attribute("W");///<zzy 2015/1/14 修改: //最大S帧确认数
     g_param.strASDULen = Protocol.attribute("ASDULen"); //ASDU数据单元长度
     g_param.strKwhCjType = Protocol.attribute("KwhCjType"); //累积量采集方式
-//    SetFunctionMap(DeviceList);///初始化点表Map
-//    SetInitSend_RX_RC_FrameList();///初始化采集信息报文
-//    m_strTcpIp = MainPort.attribute("IP");
-//    m_nPort = MainPort.attribute("Port").toInt();
 
-//    InitPointMap(DeviceList);
-//    init104Param();
     CGI_InitPointMap(DeviceList);
     init104Param();
     return true;
@@ -302,117 +223,6 @@ qDebug()<<pPoint->m_strPointName<<nPointNumber;
         break;
     }
 }
-
-/*!
- * \brief  功能概述 按照点的类型插入到相应的map中
- * \param  参数描述 DeviceListElement_是设备列表节点<DeviceList>
- * \return 返回值描述 无
- * \author zzy
- * \date   2015/5/26
- */
-void CProtocolIEC_104::InitPointMap(const QDomElement &DeviceListElement_)
-{
-    //初始化点表Map
-//    QString strPointType="";
-//    int nPointNumber = -1;
-    QDomNodeList DeviceList = DeviceListElement_.childNodes();
-    for (int i = 0; i <DeviceList.count(); ++i)
-    {
-        QDomElement DeviceElement = DeviceList.at(i).toElement();
-
-//        int DeviceAddress = DeviceElement.attribute("Address").toInt();///<zzy 2015/1/14 修改:
-        if (DeviceElement.elementsByTagName("Attribute").count() < 1)
-        {
-            Q_ASSERT(false);
-        }
-        int DeviceAddress = DeviceElement.elementsByTagName("Attribute").at(0).toElement().attribute("Address").toInt();
-        m_nCommonAddress = DeviceAddress;
-        QDomNodeList TypeNodeList = DeviceElement.elementsByTagName("Type");
-        for (int nType = 0; nType < TypeNodeList.count(); ++nType)
-        {
-            QDomElement TypeElem = TypeNodeList.at(nType).toElement();
-            if (TypeElem.attribute("Name") == "YX"){
-                int nPointCount = TypeElem.childNodes().count();
-                for (int nPoint = 0; nPoint < nPointCount; ++nPoint)
-                {
-                    InsertPoint(TypeElem.childNodes().at(nPoint).toElement(),TAG_TYPE_DI,DeviceAddress);
-                }
-            }else if (TypeElem.attribute("Name") == "YC"){
-                int nPointCount = TypeElem.childNodes().count();
-                for (int nPoint = 0; nPoint < nPointCount; ++nPoint)
-                {
-                    InsertPoint(TypeElem.childNodes().at(nPoint).toElement(),TAG_TYPE_AI,DeviceAddress);
-                }
-            }else if (TypeElem.attribute("Name") == "YM"){
-                int nPointCount = TypeElem.childNodes().count();
-                for (int nPoint = 0; nPoint < nPointCount; ++nPoint)
-                {
-                    InsertPoint(TypeElem.childNodes().at(nPoint).toElement(),TAG_TYPE_MEM,DeviceAddress);
-                }
-            }else if (TypeElem.attribute("Name") == "YK"){
-                int nPointCount = TypeElem.childNodes().count();
-                for (int nPoint = 0; nPoint < nPointCount; ++nPoint)
-                {
-                    InsertPoint(TypeElem.childNodes().at(nPoint).toElement(),TAG_TYPE_DO,DeviceAddress);
-                }
-            }else if (TypeElem.attribute("Name") == "YS"){
-                int nPointCount = TypeElem.childNodes().count();
-                for (int nPoint = 0; nPoint < nPointCount; ++nPoint)
-                {
-                    InsertPoint(TypeElem.childNodes().at(nPoint).toElement(),TAG_TYPE_AO,DeviceAddress);
-                }
-            }else{
-                Q_ASSERT(false);
-            }
-        }
-#if 0
-        QDomNodeList PointElement = DeviceElement.childNodes();
-        for (int j = 0; j < PointElement.count(); ++j)
-        {
-            QDomElement tagElement = PointElement.at(j).toElement();
-            CPointIEC_104 *pPoint = new CPointIEC_104;
-            pPoint->m_strPointName = tagElement.attribute("Name");
-//            qDebug() << tagElement.attribute("Name") << "213123123123213123213213123213123123122";
-            pPoint->m_strPointComment = tagElement.attribute("Desc");
-            pPoint->m_nID = tagElement.attribute("ID").toInt();
-            pPoint->m_strRTDBName = tagElement.attribute("Link");
-            pPoint->m_nScanTime = tagElement.attribute("ScanTime").toInt();
-            pPoint->m_fKValue = tagElement.attribute("KValue").toFloat();
-            pPoint->m_fBaseValue = tagElement.attribute("BaseValue").toFloat();
-            pPoint->m_pProtocol = this;
-            pPoint->m_pTag = m_pRTDB->FindTag(pPoint->m_strRTDBName);
-            pPoint->m_nDeviceAddr = DeviceAddress;
-            if (pPoint->m_pTag)
-            {
-                pPoint->m_pTag->SetCollection(pPoint);///设置采集点
-            }
-            nPointNumber = tagElement.attribute("PointNumber").toInt();
-            pPoint->m_nPointNumber = nPointNumber;
-            pPoint->m_nPublicAddress = tagElement.attribute("PublicAddress").toInt();
-
-            strPointType = tagElement.attribute("Type");
-            if ("yaoxin" == strPointType){
-                YX_PointMap.insert(nPointNumber,pPoint);
-                pPoint->m_nTagType = TAG_TYPE_DI;
-            }else if ("yaoce" == strPointType){
-                YC_PointMap.insert(nPointNumber,pPoint);
-                pPoint->m_nTagType = TAG_TYPE_AI;
-            }else if ("yaokong" == strPointType){
-                YK_PointMap.insert(nPointNumber,pPoint);
-                pPoint->m_nTagType = TAG_TYPE_DO;
-                pPoint->m_nYK_Type = tagElement.attribute("YKType").toInt();
-            }else if ("yaoshe" == strPointType){
-                YS_PointMap.insert(nPointNumber,pPoint);
-                pPoint->m_nTagType = TAG_TYPE_AO;
-            }else if ("yaomai" == strPointType){
-                YM_PointMap.insert(nPointNumber,pPoint);
-                pPoint->m_nTagType = TAG_TYPE_MEM;//遥脉类型
-            }
-        }
-#endif
-    }
-}
-
 /*!
  * \brief  功能概述 按照点的类型插入到相应的map中
  * \param  参数描述 DeviceListElement_是设备列表节点<DeviceList>
@@ -429,8 +239,6 @@ void CProtocolIEC_104::InitPointMap(const QDomElement &DeviceListElement_)
 void CProtocolIEC_104::CGI_InitPointMap(const QDomElement &DeviceListElement_)
 {
     //初始化点表Map
-//    QString strPointType="";
-//    int nPointNumber = -1;
     QDomNodeList DeviceList = DeviceListElement_.childNodes();
     for (int i = 0; i <DeviceList.count(); ++i)
     {
@@ -511,7 +319,7 @@ void CProtocolIEC_104::CGI_InitPointMap(const QDomElement &DeviceListElement_)
                     int nPointNumber = PointElem_.attribute("Device_YC_RegisterAddress_Strings").toInt();
                     pPoint->m_nPointNumber = nPointNumber;
                     pPoint->m_nPublicAddress = PointElem_.attribute("Device_YC_PublicAddress_Strings").toInt();
-                    pPoint->m_nTagType = TAG_TYPE_DI;
+                    pPoint->m_nTagType = TAG_TYPE_AI;
                     QString debug = QString("%1 %2 %3 :").arg(__FILE__).arg(__LINE__).arg(__func__);
                     qDebug()<<debug<<pPoint->m_strRTDBName<<pPoint->m_strPointName<<nPointNumber;
                     if (!YC_PointMap.contains(nPointNumber))
@@ -547,7 +355,7 @@ void CProtocolIEC_104::CGI_InitPointMap(const QDomElement &DeviceListElement_)
                     int nPointNumber = PointElem_.attribute("Device_YM_RegisterAddress_Strings").toInt();
                     pPoint->m_nPointNumber = nPointNumber;
                     pPoint->m_nPublicAddress = PointElem_.attribute("Device_YM_PublicAddress_Strings").toInt();
-                    pPoint->m_nTagType = TAG_TYPE_DI;
+                    pPoint->m_nTagType = TAG_TYPE_MEM;
                     QString debug = QString("%1 %2 %3 :").arg(__FILE__).arg(__LINE__).arg(__func__);
                     qDebug()<<debug<<pPoint->m_strRTDBName<<pPoint->m_strPointName<<nPointNumber;
                     if (!YM_PointMap.contains(nPointNumber))
@@ -583,9 +391,29 @@ void CProtocolIEC_104::CGI_InitPointMap(const QDomElement &DeviceListElement_)
                     int nPointNumber = PointElem_.attribute("Device_YK_RegisterAddress_Strings").toInt();
                     pPoint->m_nPointNumber = nPointNumber;
                     pPoint->m_nPublicAddress = PointElem_.attribute("Device_YK_PublicAddress_Strings").toInt();
-                    pPoint->m_nTagType = TAG_TYPE_DI;
-                    QString debug = QString("%1 %2 %3 :").arg(__FILE__).arg(__LINE__).arg(__func__);
-                    qDebug()<<debug<<pPoint->m_strRTDBName<<pPoint->m_strPointName<<nPointNumber;
+                    pPoint->m_nTagType = TAG_TYPE_DO;
+                    QString str104Type = PointElem_.attribute("Device_YK_104type_Strings");
+                    if (str104Type == "单位遥控")
+                    {
+                        pPoint->m_nYK_Type = C_SC_NA_1;
+                    }else if (str104Type == "双位遥控")
+                    {
+                        pPoint->m_nYK_Type = C_DC_NA_1;
+                    }else if (str104Type == "档位调节")
+                    {
+                        pPoint->m_nYK_Type = C_RC_NA_1;
+                    }else
+                    {
+                        pPoint->m_nYK_Type = C_SC_NA_1;
+                    }
+
+                    pPoint->m_nOut_Type = PointElem_.attribute("Device_YK_104Out_type_Strings").toUInt();
+                    if (pPoint->m_nOut_Type > 3)
+                    {
+                        pPoint->m_nOut_Type = 0;
+                    }
+
+                    qDebug()<<pPoint->m_strRTDBName<<pPoint->m_strPointName<<nPointNumber;
                     if (!YK_PointMap.contains(nPointNumber))
                     {
                         YK_PointMap.insert(nPointNumber,pPoint);
@@ -619,9 +447,27 @@ void CProtocolIEC_104::CGI_InitPointMap(const QDomElement &DeviceListElement_)
                     int nPointNumber = PointElem_.attribute("Device_YS_RegisterAddress_Strings").toInt();
                     pPoint->m_nPointNumber = nPointNumber;
                     pPoint->m_nPublicAddress = PointElem_.attribute("Device_YS_PublicAddress_Strings").toInt();
-                    pPoint->m_nTagType = TAG_TYPE_DI;
-                    QString debug = QString("%1 %2 %3 :").arg(__FILE__).arg(__LINE__).arg(__func__);
-                    qDebug()<<debug<<pPoint->m_strRTDBName<<pPoint->m_strPointName<<nPointNumber;
+                    pPoint->m_nTagType = TAG_TYPE_AO;
+
+                    QString str104Type = PointElem_.attribute("Device_YS_104type_Strings");
+                    if (str104Type == "归一化值")
+                    {
+                        pPoint->m_nYS_Type = C_SE_NA_1;
+                    }else if (str104Type == "标度化值")
+                    {
+                        pPoint->m_nYS_Type = C_SE_NB_1;
+                    }else if (str104Type == "短浮点值")
+                    {
+                        pPoint->m_nYS_Type = C_SE_NC_1;
+                    }else if (str104Type == "多个设定值")
+                    {
+                        pPoint->m_nYS_Type = C_SE_ND_1;
+                    }else
+                    {
+                        pPoint->m_nYS_Type = C_SE_NC_1;
+                    }
+
+                    qDebug()<<pPoint->m_strRTDBName<<pPoint->m_strPointName<<nPointNumber;
                     if (!YS_PointMap.contains(nPointNumber))
                     {
                         YS_PointMap.insert(nPointNumber,pPoint);
@@ -641,7 +487,7 @@ void CProtocolIEC_104::CGI_InitPointMap(const QDomElement &DeviceListElement_)
  * \author zzy
  * \date   2015/5/26
  */
-bool CProtocolIEC_104::OnTagChange(CPointBase *pPointBase_, QVariant /*VarSet_*/)
+bool CProtocolIEC_104::OnTagChange(CPointBase *pPointBase_, QVariant VarSet_)
 {
     /// 转发遥控、遥设
     /// 生成遥控、遥设报文
@@ -650,10 +496,12 @@ bool CProtocolIEC_104::OnTagChange(CPointBase *pPointBase_, QVariant /*VarSet_*/
     case TAG_TYPE_AI://遥测
         break;
     case TAG_TYPE_AO://遥设
+        emit signal_YS_Change(pPointBase_,VarSet_);
         break;
     case TAG_TYPE_DI://遥信
         break;
     case TAG_TYPE_DO://遥控
+        emit signal_YK_Change(pPointBase_,VarSet_);
         break;
     case TAG_TYPE_MEM:
 
@@ -804,6 +652,47 @@ void CProtocolIEC_104::slotConnect(bool isConnected_)
             m_bTimerIsStart = false;
         }
     }
+}
+
+/*!
+ \brief YS处理函数
+
+ \fn CProtocolIEC_104::slot_YS_Change
+ \param pPointBase_
+ \param VarSet_
+*/
+void CProtocolIEC_104::slot_YS_Change(CPointBase *pPointBase_, QVariant VarSet_)
+{
+    if (pPointBase_->m_nTagType == TAG_TYPE_AO)
+    {
+        CPointIEC_104 *pPoint = (CPointIEC_104*)pPointBase_;
+        switch (pPoint->m_nYS_Type) {
+        case C_SE_NA_1:
+        case C_SE_NB_1:
+        case C_SE_NC_1:
+        case C_SE_ND_1:
+            m_IEC104Query.MakeQuery_I_YS(m_nSendIdx,m_nReciveIdx,m_nCommonAddress,pPoint->m_nYS_Type,pPoint->m_nPointNumber,VarSet_);
+            SendFrame(m_IEC104Query);
+            break;
+        default:
+            break;
+        }
+    }else
+    {
+
+    }
+}
+
+/*!
+ \brief YK处理函数
+
+ \fn CProtocolIEC_104::slot_YK_Change
+ \param pPointBase_
+ \param VarSet_
+*/
+void CProtocolIEC_104::slot_YK_Change(CPointBase *pPointBase_, QVariant VarSet_)
+{
+
 }
 
 /*!

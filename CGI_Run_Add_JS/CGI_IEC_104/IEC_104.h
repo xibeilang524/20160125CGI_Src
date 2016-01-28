@@ -467,7 +467,24 @@ public:
 public:
     int GetSize(){return 1;}
 };
+/*!
+ \brief 7.2.6.39设定命令限定词(QOS)
 
+ \class ASDU101_QOS IEC_104.h "IEC_104.h"
+*/
+struct ASDU101_QOS
+{
+public:
+    /*	<00> := default
+        <1..63> := reserved for standard definitions of this companion standard (compatible range)
+        <64..127> := reserved for special use (private range )  */
+    BYTE	QL:7;
+    /*	<0> := Execute
+        <1> := Select 	*/
+    BYTE	SE:1;
+public:
+    size_t GetSize(){return 5;}
+};
 //7.2.6.1 带品质描述词的单点信息(IEV 371-02-07)(SIQ)
 /*!
  * \struct ASDU101_SIQ
@@ -637,11 +654,11 @@ public:
 struct ASDU101_NVA
 {
 public:
-    short int nValue;
+    short int m_nValue;
 public:
     int GetValue()
     {
-        return nValue;
+        return m_nValue;
     }
 
     int GetSize(){return 2;}

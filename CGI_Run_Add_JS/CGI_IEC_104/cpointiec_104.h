@@ -16,6 +16,7 @@
 #ifndef CPOINTIEC_104_H
 #define CPOINTIEC_104_H
 #include "../PortInclude/cpointbase.h"
+#include "IEC_104.h"
 
 /*!
  * \class  CPointIEC_104
@@ -32,7 +33,10 @@ public:
     int m_nDeviceAddr;      ///< 设备地址
     int m_nPublicAddress;   ///< 公共地址
     int m_nPointNumber;     ///< 点号
-    int m_nYK_Type;
+    ASDU101_TYPE    m_nYK_Type;     ///< 遥控类型
+    BYTE            m_nOut_Type;    ///< 输出类型
+
+    ASDU101_TYPE    m_nYS_Type;     ///< 遥设类型
 };
 
 #endif // CPOINTIEC_104_H

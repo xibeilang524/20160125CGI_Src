@@ -3667,4 +3667,5 @@ void CProtocolDeliverIEC_104::init104Param()
     m_nSendIdx = 0;
     m_nReciveIdx = 0;
     InitPointMapValue();
+    m_SendFrameList.clear();
 }

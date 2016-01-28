@@ -35,28 +35,8 @@ CProtocolDemo::CProtocolDemo(QObject */*parent*/)
     m_nTimerID = 0;
 }
 
-bool CProtocolDemo::OnCreateChannel(const QString strChannelFileName_, CRTDBI *pDatabaseReturn)
+bool CProtocolDemo::OnCreateChannel(const QString , CRTDBI *)
 {
-    SetPROTOCOL_TYPE(Collect_Type);
-
-    if (!CProtocolBase::OnCreateChannel(strChannelFileName_,pDatabaseReturn))
-        return false;
-
-    QFile file(strChannelFileName_);
-    QDomDocument ChannelDoc;
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-        return false;
-    QString errorStr;
-    int errorLine;
-    int errorColumn;
-    if (!ChannelDoc.setContent(&file, false, &errorStr, &errorLine, &errorColumn))
-    {
-        qDebug()<<strChannelFileName_<<"XML File Error Message:"<<errorStr<<" Error Line:"<<errorLine<<" Error Column:"<<errorColumn;
-        return false;
-    }
-    file.close();
-
-
     return true;
 }
 
@@ -492,6 +472,9 @@ bool CProtocolDemo::ChangeValue(CPointDemoBase *pPoint)
         break;
     case 82://遥信量  参数为:82每次变位的可能性(0-100)
         GetRand(pPoint);
+        break;
+    case 86://遥信量  参数为:82每次变位的可能性(0-100)
+//        GetRand(pPoint);
         break;
     default:
         Q_ASSERT(false);//"未定义的取值方式\n"
