@@ -687,8 +687,8 @@ void CProtocolIEC_104::slot_YS_Change(CPointBase *pPointBase_, QVariant VarSet_)
  \brief YK处理函数
 
  \fn CProtocolIEC_104::slot_YK_Change
- \param pPointBase_
- \param VarSet_
+ \param pPointBase_ aaaaaa
+ \param VarSet_ aaaaaaaa
 */
 void CProtocolIEC_104::slot_YK_Change(CPointBase *pPointBase_, QVariant VarSet_)
 {
