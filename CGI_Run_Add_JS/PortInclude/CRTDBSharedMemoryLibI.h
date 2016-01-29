@@ -14,18 +14,21 @@
 #include <QVariant>
 #include <QVector>
 #include "CSharedMemoryPoint.h"
+class CTagI;
 
 class CSharedMemoryTag
 {
 public:
-    CSharedMemoryTag(int nTagIndex_, int nTagType_, QString strTagRTDBName_){
+    CSharedMemoryTag(int nTagIndex_, int nTagType_, QString strTagRTDBName_,CTagI *pTag_ = NULL){
         m_nTagIndex = nTagIndex_;
         m_nTagType = nTagType_;
         m_strTagRTDBName = strTagRTDBName_;
+        m_pTag = pTag_;
     }
     int m_nTagIndex;
     int m_nTagType;
     QString m_strTagRTDBName;
+    CTagI *m_pTag;
 };
 
 class RTDBSHAREDMEMORYLIBSHARED_EXPORT CRTDBSharedMemoryLibI : public QObject
@@ -39,6 +42,8 @@ public:
     virtual QList<CSharedMemoryPoint> GetValue(QList<int> nIDList_) = 0;///< 获取值
     virtual CSharedMemoryPoint GetValue(int nID_) = 0;
     virtual CSharedMemoryPoint GetValue(QString strRTDBName_) = 0;
+    virtual bool YKYSSetValue(int nID_, QVariant varValue_) = 0;
+    virtual bool YKYSSetValue(QString strRTDBName_, QVariant varValue_) = 0;
 };
 extern "C" RTDBSHAREDMEMORYLIBSHARED_EXPORT CRTDBSharedMemoryLibI * CreateDriver(QObject *parent);
 

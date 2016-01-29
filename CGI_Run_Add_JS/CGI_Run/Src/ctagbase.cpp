@@ -309,12 +309,13 @@ CPointI *CTagBase::GetPointCollection()
 }
 
 /*!
- * \brief  功能概述 设置值
- * \param  参数描述 VarProject_是工程值，VarOriginal_是原始值
- * \return 返回值描述 无
- * \author zzy
- * \date   2015/5/22
- */
+ \brief 设置值
+
+ \fn CTagBase::SetValue
+ \param pPoint_ 当CPointI指针为NULL时，定义为RTDB驱动调用的SetValue，用于转发遥控
+ \param VarProject_ 工程值
+ \param VarOriginal_ 原始值
+*/
 void CTagBase::SetValue(CPointI *pPoint_, QVariant VarProject_, QVariant VarOriginal_)
 {
     qDebug()<<this->GetName()<<"工程值: "<<VarProject_<<"  "<<"原始值: "<<VarOriginal_;

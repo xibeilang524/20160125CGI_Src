@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QDir>
+#include "../PortInclude/CTagI.h"
 /*!
  * \brief 功能概述 库文件导出接口函数
  * \param 参数描述 parent是QObject对象指针
@@ -20,7 +21,321 @@ CRTDBSharedMemoryLibI * CreateDriver(QObject *parent)
 CRTDBSharedMemoryLibBase::CRTDBSharedMemoryLibBase(QObject */*parent*/)
 {
     m_isSucceed = false;
+    m_nTimerID = 0;
     connect(this,SIGNAL(Signal_SetValue(int,QVariant)),this,SLOT(Slot_SetValue(int,QVariant)));
+}
+
+void CRTDBSharedMemoryLibBase::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_nTimerID)
+    {
+        if (m_isSucceed)
+        {
+            ChangeRTDBValueYKYS();
+        }
+    }
+}
+
+bool CRTDBSharedMemoryLibBase::ChangeRTDBValueYKYS()
+{
+    QMap<int, CSharedMemoryTag *>::iterator iterator;
+    for (iterator = m_pRTDB->begin(); iterator != m_pRTDB->end(); ++iterator)
+    {
+        CSharedMemoryTag *pShMeTag = iterator.value();
+        int nPointNumber = pShMeTag->m_nTagIndex;
+        switch (pShMeTag->m_nTagType) {
+        case TAG_TYPE_DO:
+        case TAG_TYPE_AO:
+        {
+            int nPianYi = nPointNumber * 36;
+            char *to = (char*)m_SharedMemory.data();
+            if (to == NULL)
+            {
+                continue;
+            }
+            QString strDateTime;
+
+            m_SharedMemory.lock();
+            int nType = *(int *)(to+nPianYi);
+//            qDebug()<<__func__<<__LINE__<<"m_isSucceed"<<m_isSucceed<<"nType"<<nType<<QVariant::Bool<<QMetaType::Float;
+            int nCount = *(int *)(to + nPianYi + 8);
+
+            m_SharedMemory.unlock();
+            if (nCount <= 0)
+            {
+                continue;
+            }else
+            {
+                m_SharedMemory.lock();
+                QVariant var;
+                switch (nType) {
+                case QVariant::Bool:
+                {
+                    int bValue = *(int *)(to + nPianYi + 4);
+                    var.setValue(bValue);
+//                    QVariant var(bValue);
+                }
+                    break;
+                case QVariant::UInt:
+                {
+                    uint uValue = *(uint *)(to + nPianYi + 4);
+                    var.setValue(uValue);
+//                    QVariant var(uValue);
+                }
+                    break;
+                case QVariant::Int:
+                {
+                    int nValue = *(int *)(to + nPianYi + 4);
+                    var.setValue(nValue);
+//                    QVariant var(nValue);
+                }
+                    break;
+                case QMetaType::Float:
+                {
+                    float fValue = *(float *)(to + nPianYi + 4);
+                    var.setValue(fValue);
+//                    QVariant var(fValue);
+                }
+                    break;
+                default:
+                {
+                    int nValue = *(int *)(to + nPianYi + 4);
+                    var.setValue(nValue);
+//                    QVariant var(nValue);
+                }
+                    break;
+                }
+                strDateTime = QString( (char *)(to+nPianYi+12) );
+                qDebug()<<__func__<<__LINE__<<nPointNumber<<strDateTime<<pShMeTag->m_strTagRTDBName<<var;
+                *(int *)(to + nPianYi + 8) = 0;
+                m_SharedMemory.unlock();
+                pShMeTag->m_pTag->SetValue(NULL,var,var);
+            }
+
+        }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+bool CRTDBSharedMemoryLibBase::YKYSSetValue(int nID_, QVariant varValue_)
+{
+    qDebug()<<__func__<<__FILE__<<4<<m_isSucceed;
+    if (m_isSucceed)
+    {
+        CSharedMemoryTag *pSharedMemoryTag = m_pRTDB->value(nID_);
+        qDebug()<<"nID_11 ="<<nID_<<"varValue_ ="<<varValue_;
+        if(pSharedMemoryTag != NULL)
+        {
+            int nPianYi = pSharedMemoryTag->m_nTagIndex * 36;
+            char *to = (char*)m_SharedMemory.data();
+            if (to == NULL)
+            {
+                return false;
+            }
+
+            m_SharedMemory.lock();
+            int nCount = *(int *)(to + nPianYi + 8);
+            nCount += 1;
+            *(int *)(to + nPianYi + 8) = nCount;
+            m_SharedMemory.unlock();
+
+            qDebug()<<"nID_22 ="<<nID_<<"varValue_ ="<<varValue_;
+            switch (varValue_.type())
+            {
+                case QVariant::Bool:     //0   bool
+                {
+                    // Write into the shared memory
+                    bool bValue = varValue_.toBool();
+                    qDebug()<<"bool"<<varValue_<<bValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::Bool;
+                    *(int *)(to+(nPianYi+4)) = bValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                case QVariant::UInt:      //5   4字节无符号数
+                {
+                    // Write into the shared memory
+                    unsigned int unValue = varValue_.toUInt();
+                    qDebug()<<"unValue"<<varValue_<<unValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::UInt;
+                    *(unsigned int *)(to+(nPianYi+4)) = unValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                case QVariant::Int:      //6   4字节有符号数
+                {
+                    // Write into the shared memory
+                    int nValue = varValue_.toInt();
+                    qDebug()<<"nValue"<<varValue_<<nValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::Int;
+                    *(int *)(to+(nPianYi+4)) = nValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                case QVariant::Double:        //11  4字节浮点数
+                {
+                    // Write into the shared memory
+                    float fValue = varValue_.toDouble();
+                    qDebug()<<"fValue"<<varValue_<<fValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QMetaType::Float;
+                    *(float *)(to+(nPianYi+4)) = fValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                default:
+                {
+                    // Write into the shared memory
+                    int nValue = varValue_.toInt();
+                    qDebug()<<"nValue"<<varValue_<<nValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::Int;
+                    *(int *)(to+(nPianYi+4)) = nValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                    break;
+                }
+            }
+            /// 设置时标
+            QString strDateTime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss.zzz");
+            memcpy(to+nPianYi+12,strDateTime.toUtf8().data(),strDateTime.toUtf8().count());
+            qDebug()<<"nID_ ="<<nID_<<"设置时标"<<(char *)(to+nPianYi+12)<<nID_;
+            return true;
+        }else
+        {
+            return false;
+        }
+    }else
+    {
+        return false;
+    }
+}
+
+bool CRTDBSharedMemoryLibBase::YKYSSetValue(QString strRTDBName_, QVariant varValue_)
+{
+    qDebug()<<__func__<<__LINE__<<"m_isSucceed"<<m_isSucceed<<strRTDBName_;
+    int nID_ = -1;
+    if (m_isSucceed)
+    {
+
+        QMap<int, CSharedMemoryTag *>::iterator iterator;
+        CSharedMemoryTag *pSharedMemoryTag = NULL;
+        for (iterator = m_pRTDB->begin(); iterator != m_pRTDB->end(); ++iterator)
+        {
+            qDebug()<<__func__<<__LINE__<<iterator.value()->m_strTagRTDBName<<strRTDBName_;
+            if (iterator.value()->m_strTagRTDBName == strRTDBName_)
+            {
+                pSharedMemoryTag = iterator.value();
+                nID_ = iterator.value()->m_nTagIndex;
+                break;
+            }
+        }
+        qDebug()<<__func__<<__FILE__<<4<<m_isSucceed;
+
+//        pSharedMemoryTag = m_pRTDB->value(nID_);
+        qDebug()<<"nID_11 ="<<nID_<<"varValue_ ="<<varValue_;
+        if(pSharedMemoryTag != NULL)
+        {
+            int nPianYi = pSharedMemoryTag->m_nTagIndex * 36;
+            char *to = (char*)m_SharedMemory.data();
+            if (to == NULL)
+            {
+                return false;
+            }
+
+            m_SharedMemory.lock();
+            int nCount = *(int *)(to + nPianYi + 8);
+            nCount += 1;
+            *(int *)(to + nPianYi + 8) = nCount;
+            m_SharedMemory.unlock();
+
+            qDebug()<<"nID_22 ="<<nID_<<"varValue_ ="<<varValue_;
+            switch (varValue_.type())
+            {
+                case QVariant::Bool:     //0   bool
+                {
+                    // Write into the shared memory
+                    bool bValue = varValue_.toBool();
+                    qDebug()<<"bool"<<varValue_<<bValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::Bool;
+                    *(int *)(to+(nPianYi+4)) = bValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                case QVariant::UInt:      //5   4字节无符号数
+                {
+                    // Write into the shared memory
+                    unsigned int unValue = varValue_.toUInt();
+                    qDebug()<<"unValue"<<varValue_<<unValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::UInt;
+                    *(unsigned int *)(to+(nPianYi+4)) = unValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                case QVariant::Int:      //6   4字节有符号数
+                {
+                    // Write into the shared memory
+                    int nValue = varValue_.toInt();
+                    qDebug()<<"nValue"<<varValue_<<nValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::Int;
+                    *(int *)(to+(nPianYi+4)) = nValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                case QVariant::Double:        //11  4字节浮点数
+                {
+                    // Write into the shared memory
+                    float fValue = varValue_.toDouble();
+                    qDebug()<<"fValue"<<varValue_<<fValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QMetaType::Float;
+                    *(float *)(to+(nPianYi+4)) = fValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                }
+                    break;
+                default:
+                {
+                    // Write into the shared memory
+                    int nValue = varValue_.toInt();
+                    qDebug()<<"nValue"<<varValue_<<nValue;
+                    m_SharedMemory.lock();
+                    *(int *)(to+(nPianYi)) = QVariant::Int;
+                    *(int *)(to+(nPianYi+4)) = nValue;
+                    qDebug()<<"xie ru le 11111";
+                    m_SharedMemory.unlock();
+                    break;
+                }
+            }
+            /// 设置时标
+            QString strDateTime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss.zzz");
+            memcpy(to+nPianYi+12,strDateTime.toUtf8().data(),strDateTime.toUtf8().count());
+            qDebug()<<"nID_ ="<<nID_<<"设置时标"<<(char *)(to+nPianYi+12)<<nID_;
+            return true;
+        }else
+        {
+            return false;
+        }
+    }else
+    {
+        return false;
+    }
 }
 
 bool CRTDBSharedMemoryLibBase::Create(QMap<int, CSharedMemoryTag *> *pRTDB_, QString /*strFileName_*/)
@@ -51,7 +366,7 @@ bool CRTDBSharedMemoryLibBase::Create(QMap<int, CSharedMemoryTag *> *pRTDB_, QSt
         Root.appendChild(Tag);
     }
     CXmlParser::writeFile(tr("SCADA_RTDB_SharedMemoryLib.xml"),SCADA_RTDB_SharedMemoryLib);
-    m_nSize = (m_nMaxTagIndex+10)*(4+4+24)+1024;///< 每个变量占用32字节 前4个字节是值类型，中间4个字节是实时值，后24个字节是时标
+    m_nSize = (m_nMaxTagIndex+10)*(4+4+4+24)+1024;///< 每个变量占用32字节 前4个字节是值类型，中间4个字节是实时值,后4个字节是遥控次数，后24个字节是时标
     if (m_nSize < 1024*30)
     {
         m_nSize = 1024*30;
@@ -71,6 +386,7 @@ bool CRTDBSharedMemoryLibBase::Create(QMap<int, CSharedMemoryTag *> *pRTDB_, QSt
 //        qDebug()<<"xie ru le ";
 //        m_SharedMemory.unlock();
         qDebug()<<"Create sharedMemory secceed."<<m_SharedMemory.key()<<m_SharedMemory.nativeKey();
+        m_nTimerID = startTimer(100);
         return true;
     }else
     {
@@ -229,7 +545,7 @@ QList<CSharedMemoryPoint> CRTDBSharedMemoryLibBase::GetValue(QList<int> nIDList_
             CSharedMemoryTag *pSharedMemoryTag = m_pRTDB->value(nIndex);
             if(pSharedMemoryTag)
             {
-                int nPianYi = pSharedMemoryTag->m_nTagIndex * 32;
+                int nPianYi = pSharedMemoryTag->m_nTagIndex * 36;
                 char *to = (char*)m_SharedMemory.data();
                 if (to == NULL)
                 {
@@ -278,7 +594,7 @@ QList<CSharedMemoryPoint> CRTDBSharedMemoryLibBase::GetValue(QList<int> nIDList_
                 }
                     break;
                 }
-                strDateTime = QString( (char *)(to+nPianYi+8) );
+                strDateTime = QString( (char *)(to+nPianYi+12) );
 //                qDebug()<<"du qu le"<<nIndex;
                 m_SharedMemory.unlock();
                 sharedMemoryPoint.m_strDateTime = strDateTime;
@@ -305,7 +621,7 @@ CSharedMemoryPoint CRTDBSharedMemoryLibBase::GetValue(int nID_)
         CSharedMemoryTag *pSharedMemoryTag = m_pRTDB->value(nID_);
         if(pSharedMemoryTag)
         {
-            int nPianYi = pSharedMemoryTag->m_nTagIndex * 32;
+            int nPianYi = pSharedMemoryTag->m_nTagIndex * 36;
             char *to = (char*)m_SharedMemory.data();
             if (to == NULL)
             {
@@ -353,7 +669,7 @@ CSharedMemoryPoint CRTDBSharedMemoryLibBase::GetValue(int nID_)
             }
                 break;
             }
-            strDateTime = QString( (char *)(to+nPianYi+8) );
+            strDateTime = QString( (char *)(to+nPianYi+12) );
 //            qDebug()<<"du qu le"<<nID_<<strDateTime;
             m_SharedMemory.unlock();
             sharedMemoryPoint.m_strDateTime = strDateTime;
@@ -394,7 +710,7 @@ CSharedMemoryPoint CRTDBSharedMemoryLibBase::GetValue(QString strRTDBName_)
         if(pSharedMemoryTag)
         {
             qDebug()<<" if(pSharedMemoryTag)"<<pSharedMemoryTag->m_nTagIndex<<pSharedMemoryTag->m_strTagRTDBName;
-            int nPianYi = pSharedMemoryTag->m_nTagIndex * 32;
+            int nPianYi = pSharedMemoryTag->m_nTagIndex * 36;
             char *to = (char*)m_SharedMemory.data();
             if (to == NULL)
             {
@@ -445,7 +761,7 @@ CSharedMemoryPoint CRTDBSharedMemoryLibBase::GetValue(QString strRTDBName_)
             }
                 break;
             }
-            strDateTime = QString( (char *)(to+nPianYi+8) );
+            strDateTime = QString( (char *)(to+nPianYi+12) );
             qDebug()<<"du qu le"<<nID_<<strDateTime;
             m_SharedMemory.unlock();
             sharedMemoryPoint.m_strDateTime = strDateTime;
@@ -472,7 +788,7 @@ bool CRTDBSharedMemoryLibBase::Slot_SetValue(int nID_, QVariant varValue_)
         qDebug()<<"nID_11 ="<<nID_<<"varValue_ ="<<varValue_;
         if(pSharedMemoryTag != NULL)
         {
-            int nPianYi = pSharedMemoryTag->m_nTagIndex * 32;
+            int nPianYi = pSharedMemoryTag->m_nTagIndex * 36;
             char *to = (char*)m_SharedMemory.data();
             if (to == NULL)
             {
@@ -545,8 +861,8 @@ bool CRTDBSharedMemoryLibBase::Slot_SetValue(int nID_, QVariant varValue_)
             }
             /// 设置时标
             QString strDateTime = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss.zzz");
-            memcpy(to+nPianYi+8,strDateTime.toUtf8().data(),strDateTime.toUtf8().count());
-            qDebug()<<"nID_ ="<<nID_<<"设置时标"<<(char *)(to+nPianYi+8)<<nID_;
+            memcpy(to+nPianYi+12,strDateTime.toUtf8().data(),strDateTime.toUtf8().count());
+            qDebug()<<"nID_ ="<<nID_<<"设置时标"<<(char *)(to+nPianYi+12)<<nID_;
             return true;
         }else
         {

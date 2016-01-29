@@ -31,7 +31,9 @@ SUBDIRS += \
     MonitorDeliverIEC-104 \
     RTFrameSharedMemoryLib \
     CGI_JavaScript_DataChange \
-    CGI_JavaScript_Timing
+    CGI_JavaScript_Timing \
+    RTDBSharedMemoryLib_AddYKYS \
+    CGI_RTDB_web3_SetValue
 
 win32 {
     SUBDIRS += CGI_Monitor \

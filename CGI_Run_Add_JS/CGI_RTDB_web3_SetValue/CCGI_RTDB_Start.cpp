@@ -80,11 +80,21 @@ bool CCGI_RTDB_Start::SetValue(int nID_, QVariant varValue_)
 {
     if (m_nIsConnect)
     {
-        return m_pRTDBSharedMemoryLibI->SetValue(nID_,varValue_);
+        return m_pRTDBSharedMemoryLibI->YKYSSetValue(nID_,varValue_);
     }else{
         return false;
     }
 
+}
+
+bool CCGI_RTDB_Start::SetValue(QString TagName_, QVariant varValue_)
+{
+    if (m_nIsConnect)
+    {
+        return m_pRTDBSharedMemoryLibI->YKYSSetValue(TagName_,varValue_);
+    }else{
+        return false;
+    }
 }
 
 QList<CSharedMemoryPoint> CCGI_RTDB_Start::GetValue(QList<int> nIDList_)

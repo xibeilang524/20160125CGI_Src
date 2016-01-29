@@ -254,7 +254,7 @@ bool CStart::ReadFilePoint(QString strFileName)
                 if (m_pRealTimeDB->AddTag(strLinkName,pTagBase))
                 {
                     qDebug()<<"111"<<QString::number(pTagBase->GetType())<<pTagBase->GetName();
-                    CSharedMemoryTag *pSharedMemoryTag = new CSharedMemoryTag(m_nTagID,pTagBase->GetType(), pTagBase->GetName());
+                    CSharedMemoryTag *pSharedMemoryTag = new CSharedMemoryTag(m_nTagID,pTagBase->GetType(), pTagBase->GetName(),pTagBase);
                     qDebug()<<"222"<<QString::number(pTagBase->GetType())<<pTagBase->GetName();
                     if(!m_pSharedMemoryTagMap->contains(m_nTagID-1))
                     {
@@ -444,15 +444,15 @@ bool CStart::InitChannel()
     {
         ///<zzy 2015/7/5 修改:
         m_pRTDBSharedMemoryThread->SetpRTDB(m_pSharedMemoryTagMap);
-        m_ThreadList.append(m_pRTDBSharedMemoryThread);
-//        m_pRTDBSharedMemoryThread->start();
+//        m_ThreadList.append(m_pRTDBSharedMemoryThread);///< 20160129 change
+        m_pRTDBSharedMemoryThread->start();///< 20160129 change
         ///<zzy 2015/7/5 修改:end
     }
     for (int i = 0; i < m_ThreadList.count(); ++i)
     {
         qDebug()<<__func__<<__FILE__<<__LINE__<<"Open Thread"<<i;
-        m_ThreadList.at(i)->start();
         QTest::qSleep(250);
+        m_ThreadList.at(i)->start();
     }
     return true;
 }

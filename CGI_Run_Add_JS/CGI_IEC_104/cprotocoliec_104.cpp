@@ -67,6 +67,8 @@ CProtocolIEC_104::CProtocolIEC_104(QObject */*parent*/)
     m_nMaxSRValue=32767;//收发最大值
     m_bDataLink = false;
     m_nUnconfirmIFrame = 0;
+    connect(this,SIGNAL(signal_YK_Change(CPointBase*,QVariant)),this,SLOT(slot_YK_Change(CPointBase*,QVariant)));
+    connect(this,SIGNAL(signal_YS_Change(CPointBase*,QVariant)),this,SLOT(slot_YS_Change(CPointBase*,QVariant)));
 }
 
 /*!
@@ -1669,9 +1671,13 @@ void CProtocolIEC_104::ProcessASDU101_Type001(ASDU101 &asdu)
             pTag = pPoint->GetTag();
             if (!pTag)
                 continue;
+            float aaa = pValue->SPI;
             QVariant ProjectVariant(pValue->SPI);
+            qDebug()<<__func__<<__LINE__<<ProjectVariant;
 //            QVariant OriginalVariant(pValue->SPI);
 //            pTag->SetValue(ProjectVariant,OriginalVariant);
+            ProjectVariant.setValue(aaa);
+            qDebug()<<__func__<<__LINE__<<ProjectVariant;
             pTag->SetValue(pPoint,ProjectVariant,ProjectVariant);
         }
     }
@@ -1695,9 +1701,13 @@ void CProtocolIEC_104::ProcessASDU101_Type001(ASDU101 &asdu)
             if (!pTag)
                 continue;
 //            qDebug()<<"有此点";
+            float aaa = pValue->SPI;
             QVariant ProjectVariant(pValue->SPI);
+            qDebug()<<__func__<<__LINE__<<ProjectVariant;
 //            QVariant OriginalVariant(pValue->SPI);
 //            pTag->SetValue(ProjectVariant,OriginalVariant);
+            ProjectVariant.setValue(aaa);
+            qDebug()<<__func__<<__LINE__<<ProjectVariant;
             pTag->SetValue(pPoint,ProjectVariant,ProjectVariant);
         }
     }

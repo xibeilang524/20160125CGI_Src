@@ -20,12 +20,12 @@ void CRTDBSharedMemoryThread::SetpRTDB(QMap<int, CSharedMemoryTag *> *pRTDB_)
 
 void CRTDBSharedMemoryThread::SetValue(int nID_, QVariant VarProject_)
 {
-//    qDebug()<<__func__<<__FILE__<<1;
+    qDebug()<<__func__<<__FILE__<<1;
     if (m_pRTDBSharedMemoryLibI)
     {
-//        qDebug()<<__func__<<__FILE__<<2;
+        qDebug()<<__func__<<__FILE__<<2;
         m_pRTDBSharedMemoryLibI->SetValue(nID_, VarProject_);
-//        qDebug()<<__func__<<__FILE__<<3;
+        qDebug()<<__func__<<__FILE__<<4;
     }
 }
 
