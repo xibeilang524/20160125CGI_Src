@@ -64,6 +64,16 @@ int main(int argc, char *argv[])
             }
             strResult.append(TagNameList.at(i));
             strResult.append(QString("(%1)").arg(bResult));
+            if (bResult)
+            {
+                printf("1");
+                return 1;
+            }else
+            {
+                printf("0");
+                return 1;
+                return 0;
+            }
         }
     }else
     {
